@@ -22,3 +22,6 @@ docs/.obsidian/
 
 # Logs
 *.log
+
+# Instruções locais para o Codex
+/AGENTS.md
