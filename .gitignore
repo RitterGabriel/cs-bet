@@ -1,0 +1,24 @@
+# Java
+target/
+*.class
+.gradle/
+build/
+
+# React
+node_modules/
+dist/
+
+# Ambiente e credenciais
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# Obsidian
+docs/.obsidian/
+
+# Logs
+*.log
