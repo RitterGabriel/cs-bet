@@ -1,0 +1,14 @@
+ backend/pom.xml                                                     |  4 [32m++[m
+ backend/src/main/java/com/csbet/backend/config/PasswordConfig.java  | 14 [32m++++++[m
+ .../src/main/java/com/csbet/backend/controller/UserController.java  | 28 [32m+++++++++++[m
+ backend/src/main/java/com/csbet/backend/dto/CreateUserRequest.java  | 29 [32m+++++++++++[m
+ backend/src/main/java/com/csbet/backend/dto/UserResponse.java       | 13 [32m+++++[m
+ backend/src/main/java/com/csbet/backend/entity/User.java            | 59 [32m+++++++++++++++++++++++[m
+ .../main/java/com/csbet/backend/exception/ApiExceptionHandler.java  | 28 [32m+++++++++++[m
+ .../java/com/csbet/backend/exception/UserConflictException.java     |  7 [32m+++[m
+ .../src/main/java/com/csbet/backend/repository/UserRepository.java  |  9 [32m++++[m
+ backend/src/main/java/com/csbet/backend/service/UserService.java    | 48 [32m+++++++++++++++++++[m
+ .../test/java/com/csbet/backend/controller/UserControllerTest.java  | 82 [32m++++++++++++++++++++++++++++++++[m
+ .../src/test/java/com/csbet/backend/service/UserServiceTest.java    | 76 [32m+++++++++++++++++++++++++++++[m
+ database/001_create_users.sql                                       | 16 [32m+++++++[m
+ 13 files changed, 413 insertions(+)
