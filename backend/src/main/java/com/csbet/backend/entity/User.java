@@ -48,6 +48,9 @@ public class User {
 		this.createdAt = createdAt;
 	}
 
+	@com.fasterxml.jackson.annotation.JsonIgnore
+	public String getPasswordHash() { return passwordHash; }
+
 	public Long getId() { return id; }
 	public String getUsername() { return username; }
 	public String getEmail() { return email; }

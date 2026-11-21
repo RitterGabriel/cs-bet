@@ -9,6 +9,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ApiError> handleUnauthorized(Exception exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("WWW-Authenticate", "Bearer")
+                .body(new ApiError("Credenciais inválidas ou autenticação necessária."));
+    }
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleForbidden(Exception exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiError("Acesso negado."));
+    }
     @ExceptionHandler(UserConflictException.class)
     public ResponseEntity<ApiError> handleConflict(UserConflictException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError(exception.getMessage()));

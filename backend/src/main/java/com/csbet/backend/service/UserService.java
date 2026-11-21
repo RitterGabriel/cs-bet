@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import org.springframework.security.authentication.BadCredentialsException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -21,6 +22,12 @@ public class UserService {
     public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse findAuthenticated(Long userId) {
+        return repository.findById(userId).map(UserResponse::from)
+                .orElseThrow(() -> new BadCredentialsException("Não autenticado."));
     }
 
     @Transactional
