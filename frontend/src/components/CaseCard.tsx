@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { Box, Layers3 } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import type { CatalogCase } from '../types/catalog';
+import { CatalogImage } from './CatalogImage';
 import { categoryLabels } from '../data/cases';
 
 export function CaseCard({ item }: { item: CatalogCase }) {
@@ -24,14 +25,12 @@ export function CaseCard({ item }: { item: CatalogCase }) {
             )}
             {item.category === 'official' ? 'CS2' : 'CS BET'}
           </span>
-          <img
-            src={item.image}
-            alt={`Ilustração demonstrativa de ${item.name}`}
-            loading="lazy"
-            width="640"
-            height="420"
-          />
-          <span className="art-watermark">ILUSTRAÇÃO DEMONSTRATIVA</span>
+          <CatalogImage src={item.image} alt={item.name} remote={item.isReal} />
+          <span className="art-watermark">
+            {item.isReal
+              ? 'REFERÊNCIA VISUAL'
+              : 'ILUSTRAÇÃO DEMONSTRATIVA'}
+          </span>
         </div>
         <div className="case-info">
           <span
@@ -42,7 +41,9 @@ export function CaseCard({ item }: { item: CatalogCase }) {
           <h3>{item.name}</h3>
           <p>
             {item.category === 'official'
-              ? 'Prévia do catálogo. Conteúdo em preparação.'
+              ? item.isReal
+                ? 'Conteúdo real da fonte pública ByMykel.'
+                : 'Prévia do catálogo. Conteúdo em preparação.'
               : 'Coleção temática fictícia criada pelo CS Bet.'}
           </p>
           <span className="case-cta">

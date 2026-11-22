@@ -12,6 +12,10 @@ export interface CaseItem {
   name: string;
   image: string;
   rarity: Rarity;
+  rarityData?: { id: string; name: string; color: string };
+  weapon?: string;
+  weaponType?: string;
+  specialCategory?: 'none' | 'knife' | 'glove';
 }
 
 export interface CatalogCase {
@@ -26,4 +30,11 @@ export interface CatalogCase {
   items: CaseItem[];
   specialItems: CaseItem[];
   specialKind?: 'knives' | 'gloves';
+  isReal?: boolean;
+  descriptionFromSource?: boolean;
+  language?: string;
+  source?: string;
+  sourceRevision?: string;
+  specialNotice?: string;
+  imageNotice?: string;
 }

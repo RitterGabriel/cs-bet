@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import {
   Box,
@@ -10,6 +10,9 @@ import {
   SlidersHorizontal,
   Sparkles,
 } from 'lucide-react';
+import { listOfficialCases } from '../services/catalog';
+import type { CatalogPageResponse } from '../services/catalog';
+import { ApiError } from '../services/api';
 import { CaseCard } from '../components/CaseCard';
 import { cases } from '../data/cases';
 import type { CaseCategory } from '../types/catalog';
@@ -21,9 +24,49 @@ export function CatalogPage({
   category: CaseCategory;
   home?: boolean;
 }) {
+  const custom = category === 'custom';
+  const [page, setPage] = useState(0);
+  const [retry, setRetry] = useState(0);
+  const [loading, setLoading] = useState(!custom);
+  const [error, setError] = useState('');
+  const [remote, setRemote] = useState<CatalogPageResponse>({
+    content: [],
+    page: 0,
+    size: 12,
+    totalElements: 0,
+    totalPages: 0,
+  });
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('featured');
+  useEffect(() => {
+    if (custom) return;
+    let active = true;
+    setLoading(true);
+    setError('');
+    const timer = window.setTimeout(() => {
+      listOfficialCases(page, query, sort)
+        .then((result) => {
+          if (active) setRemote(result);
+        })
+        .catch((failure) => {
+          if (active)
+            setError(
+              failure instanceof ApiError
+                ? failure.message
+                : 'Não foi possível carregar o catálogo.',
+            );
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+    }, 250);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [custom, page, query, sort, retry]);
   const visibleCases = useMemo(() => {
+    if (!custom) return remote.content;
     const result = cases.filter(
       (item) =>
         item.category === category &&
@@ -34,8 +77,7 @@ export function CatalogPage({
     return sort === 'name'
       ? result.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
       : result;
-  }, [category, query, sort]);
-  const custom = category === 'custom';
+  }, [category, custom, query, sort, remote]);
   return (
     <>
       <section className={`hero ${custom ? 'hero-custom' : ''}`}>
@@ -124,17 +166,20 @@ export function CatalogPage({
             <h2 id="catalog-title">
               {custom ? 'Coleções personalizadas' : 'Caixas oficiais'}{' '}
               <span className="count-tag">
-                {cases.filter((item) => item.category === category).length}
+                {custom
+                  ? cases.filter((item) => item.category === 'custom').length
+                  : remote.totalElements}
               </span>
             </h2>
             <p>
               {custom
                 ? 'Criações fictícias do CS Bet, inspiradas em temas e estilos.'
-                : 'Conheça algumas das caixas que fazem parte do Counter-Strike 2.'}
+                : 'Caixas oficiais de armas do Counter-Strike 2, conforme a fonte pública.'}
             </p>
           </div>
           <span className="section-label">
-            <span className="tiny-diamond" /> CATÁLOGO DEMONSTRATIVO
+            <span className="tiny-diamond" />{' '}
+            {custom ? 'CATÁLOGO DEMONSTRATIVO' : 'DADOS PÚBLICOS · BYMYKEL'}
           </span>
         </div>
         <div className="catalog-toolbar">
@@ -148,7 +193,11 @@ export function CatalogPage({
               <Search size={17} />
               <input
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setPage(0);
+                }}
+                maxLength={150}
                 type="search"
                 placeholder="Buscar no catálogo..."
                 aria-label="Buscar caixas pelo nome"
@@ -158,7 +207,10 @@ export function CatalogPage({
               <SlidersHorizontal size={16} />
               <select
                 value={sort}
-                onChange={(event) => setSort(event.target.value)}
+                onChange={(event) => {
+                  setSort(event.target.value);
+                  setPage(0);
+                }}
                 aria-label="Ordenar catálogo"
               >
                 <option value="featured">Em destaque</option>
@@ -173,7 +225,24 @@ export function CatalogPage({
             ? 'resultado encontrado'
             : 'resultados encontrados'}
         </p>
-        {visibleCases.length ? (
+        {!custom && loading ? (
+          <div className="empty-state" role="status">
+            <Box size={32} />
+            <h3>Carregando catálogo...</h3>
+            <p>Consultando as caixas oficiais.</p>
+          </div>
+        ) : !custom && error ? (
+          <div className="empty-state" role="alert">
+            <h3>Não foi possível carregar o catálogo</h3>
+            <p>{error}</p>
+            <button
+              className="button secondary"
+              onClick={() => setRetry((value) => value + 1)}
+            >
+              Tentar novamente
+            </button>
+          </div>
+        ) : visibleCases.length ? (
           <div className="case-grid">
             {visibleCases.map((item) => (
               <CaseCard key={item.id} item={item} />
@@ -183,18 +252,44 @@ export function CatalogPage({
           <div className="empty-state">
             <Search size={32} />
             <h3>Nenhuma caixa encontrada</h3>
-            <p>Tente buscar outro nome.</p>
+            <p>
+              {query
+                ? 'Tente buscar outro nome.'
+                : 'Nenhuma caixa cadastrada na API. O catálogo fica disponível após a importação.'}
+            </p>
             <button className="button secondary" onClick={() => setQuery('')}>
               Limpar busca
             </button>
           </div>
+        )}
+        {!custom && !loading && !error && remote.totalPages > 1 && (
+          <nav className="pagination" aria-label="Paginação do catálogo">
+            <button
+              className="button secondary"
+              disabled={page === 0}
+              onClick={() => setPage((value) => value - 1)}
+            >
+              Anterior
+            </button>
+            <span role="status">
+              Página {page + 1} de {remote.totalPages} · {remote.totalElements}{' '}
+              caixas
+            </span>
+            <button
+              className="button secondary"
+              disabled={page + 1 >= remote.totalPages}
+              onClick={() => setPage((value) => value + 1)}
+            >
+              Próxima
+            </button>
+          </nav>
         )}
         <div className="catalog-footnote">
           <span>
             <ShieldCheck size={16} />{' '}
             {custom
               ? 'Coleções fictícias. Não representam caixas oficiais do jogo.'
-              : 'Imagens ilustrativas. Itens e probabilidades oficiais ainda não cadastrados.'}
+              : 'Fonte: ByMykel/CSGO-API (MIT). Nomes originais preservados. Imagens sujeitas aos direitos da Valve.'}
           </span>
           <span>Explore no seu ritmo.</span>
         </div>

@@ -16,7 +16,10 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+export async function request<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 12000);
   try {
@@ -29,6 +32,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     });
     if (!response.ok) {
       const messages: Record<number, string> = {
+        404: 'O recurso solicitado não foi encontrado.',
         400: 'Confira os dados informados e tente novamente.',
         401: 'E-mail ou senha inválidos.',
         403: 'Você não tem permissão para acessar este recurso.',

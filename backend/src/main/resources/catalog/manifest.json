@@ -1,0 +1,22 @@
+{
+  "source": "https://github.com/ByMykel/CSGO-API",
+  "revision": "a9657126c997f5182306c5b78a01e92eb4153a08",
+  "language": "en",
+  "license": "MIT (data/project only; Valve images excluded from any license claim)",
+  "projection": "Only type=Case and their referenced skin metadata, retaining original identifiers. No image files bundled.",
+  "cases": 42,
+  "items": 1305,
+  "associations": 2508,
+  "files": {
+    "crates": {
+      "upstream": "https://raw.githubusercontent.com/ByMykel/CSGO-API/a9657126c997f5182306c5b78a01e92eb4153a08/public/api/en/crates.json",
+      "upstreamSha256": "1d298de95b0743fff43889b1d12c6f7b89714da23b72f11dc4930889e03ad5d2",
+      "bundledSha256": "165991abc2c7164c93ab084e5c3c5850fe8cb252b415d2c8d565aa29af1d8216"
+    },
+    "skins": {
+      "upstream": "https://raw.githubusercontent.com/ByMykel/CSGO-API/a9657126c997f5182306c5b78a01e92eb4153a08/public/api/en/skins.json",
+      "upstreamSha256": "89f09435957c4833088ac5dd0a8124220f903d2ae962c2f3d04a8e0f392536d8",
+      "bundledSha256": "c0271bf65d1cb137225b5a724adc3ac5742a1aeb628dc8d99431811e85725aa5"
+    }
+  }
+}
