@@ -8,6 +8,11 @@ import {
 } from 'react';
 import type { ReactNode } from 'react';
 import { api, ApiError } from '../services/api';
+import { fetchInventory } from '../services/inventory';
+import type {
+  InventoryPageResponse,
+  InventoryStatus,
+} from '../types/inventory';
 import type { LoginRequest, UserResponse } from '../types/api';
 
 interface Session {
@@ -23,6 +28,10 @@ interface AuthValue {
   logout: () => void;
   refreshUser: () => Promise<void>;
   dismissNotice: () => void;
+  getInventory: (
+    page: number,
+    status?: InventoryStatus,
+  ) => Promise<InventoryPageResponse>;
 }
 const AuthContext = createContext<AuthValue | undefined>(undefined);
 
@@ -64,6 +73,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('focus', check);
     };
   }, [session, expire]);
+
+  const getInventory = useCallback(
+    async (page: number, status?: InventoryStatus) => {
+      if (!session || Date.now() >= session.expiresAt) {
+        expire();
+        throw new ApiError(
+          401,
+          'Entre novamente para consultar seu inventário.',
+        );
+      }
+      const attempt = revision.current;
+      try {
+        const data = await fetchInventory(session.token, page, status);
+        if (attempt !== revision.current)
+          throw new ApiError(401, 'A sessão foi encerrada.');
+        return data;
+      } catch (error) {
+        if (
+          attempt === revision.current &&
+          error instanceof ApiError &&
+          error.status === 401
+        )
+          expire();
+        throw error;
+      }
+    },
+    [session, expire],
+  );
 
   async function login(data: LoginRequest) {
     const attempt = ++revision.current;
@@ -114,6 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         refreshUser,
+        getInventory,
         dismissNotice: () => setNotice(''),
       }}
     >

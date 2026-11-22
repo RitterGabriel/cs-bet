@@ -81,8 +81,8 @@ export function Layout() {
               </Link>
             )}
             <Link
-              to={user ? '/profile' : '/login'}
-              state={user ? undefined : { from: '/profile' }}
+              to={user ? '/inventory' : '/login'}
+              state={user ? undefined : { from: '/inventory' }}
               className="account-stat inventory-stat"
             >
               <Package size={20} />

@@ -2402,3 +2402,55 @@ main {
     padding: 11px;
   }
 }
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+.inventory-card h2 {
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+.inventory-date {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  margin-block: 16px;
+}
+.inventory-date > svg {
+  margin-top: 5px;
+}
+.inventory-date time {
+  display: block;
+}
+.inventory-status-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.inventory-status-filter select {
+  padding: 10px 14px;
+  min-height: 40px;
+}
+@media (max-width: 600px) {
+  .inventory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .inventory-status-filter {
+    justify-content: space-between;
+  }
+}
+@media (max-width: 370px) {
+  .inventory-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

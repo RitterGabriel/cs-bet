@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import {
   BarChart3,
   CalendarDays,
@@ -104,7 +105,8 @@ export function ProfilePage() {
           {
             icon: Package,
             title: 'Inventário',
-            description: 'Seus itens virtuais ficarão por aqui.',
+            description:
+              'Consulte suas unidades individuais de skins virtuais.',
           },
           {
             icon: BarChart3,
@@ -123,7 +125,13 @@ export function ProfilePage() {
             </span>
             <h2>{title}</h2>
             <p className="muted">{description}</p>
-            <span className="coming-soon">Em breve</span>
+            {title === 'Inventário' ? (
+              <Link className="button secondary" to="/inventory">
+                Meu inventário
+              </Link>
+            ) : (
+              <span className="coming-soon">Em breve</span>
+            )}
           </section>
         ))}
       </div>

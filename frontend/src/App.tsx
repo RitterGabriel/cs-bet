@@ -5,6 +5,7 @@ import { AuthPage } from './pages/AuthPage';
 import { CatalogPage } from './pages/CatalogPage';
 import { CaseDetailsPage } from './pages/CaseDetailsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { InventoryPage } from './pages/InventoryPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { StatisticsPage } from './pages/StatisticsPage';
 
@@ -27,6 +28,7 @@ export function App() {
         <Route path="register" element={<AuthPage key="register" register />} />
         <Route element={<ProtectedRoute />}>
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="inventory" element={<InventoryPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
