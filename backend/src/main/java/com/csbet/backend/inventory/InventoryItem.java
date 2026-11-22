@@ -31,6 +31,9 @@ public class InventoryItem {
     @Column(nullable = false, length = 16)
     private InventoryStatus status;
 
+    // Nulo para unidades antigas: desgaste/variante não podem ser inferidos a partir da skin.
+    private Long marketVariantId;
+
     private LocalDateTime soldAt;
 
     // Snapshot do valor efetivo de uma futura venda, nunca o preço atual do catálogo.
@@ -46,6 +49,7 @@ public class InventoryItem {
         this.status = InventoryStatus.AVAILABLE;
     }
 
+    public Long getMarketVariantId() { return marketVariantId; }
     public Long getId() { return id; }
     public CosmeticItem getSkin() { return skin; }
     public LocalDateTime getObtainedAt() { return obtainedAt; }

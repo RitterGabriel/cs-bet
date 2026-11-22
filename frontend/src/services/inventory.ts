@@ -1,4 +1,6 @@
+import { validateMarketQuote } from './market';
 import { ApiError, request } from './api';
+import { isCreditAmount, validatePrice } from './pricing';
 import type {
   InventoryPageResponse,
   InventoryStatus,
@@ -20,6 +22,13 @@ export async function fetchInventory(
   if (
     !result ||
     !Array.isArray(result.content) ||
+    result.valuationCurrency !== 'BRL' ||
+    (result.estimatedAvailableTotal !== null &&
+      !isCreditAmount(result.estimatedAvailableTotal)) ||
+    !Number.isSafeInteger(result.availableItems) ||
+    result.availableItems < 0 ||
+    !Number.isSafeInteger(result.unpricedAvailableItems) ||
+    result.unpricedAvailableItems < 0 ||
     !Number.isSafeInteger(result.totalElements) ||
     result.totalElements < 0 ||
     !Number.isInteger(result.totalPages) ||
@@ -50,5 +59,9 @@ export async function fetchInventory(
       'Os dados do inventário estão incompletos. Tente novamente.',
     );
   }
+  result.content.forEach((item) => {
+    validatePrice(item.simulatedPrice);
+    item.marketPrice = validateMarketQuote(item.marketPrice);
+  });
   return result;
 }

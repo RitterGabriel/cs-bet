@@ -1,3 +1,5 @@
+import type { MarketQuote } from '../services/market';
+import type { SimulatedPrice } from '../services/pricing';
 export type InventoryStatus = 'AVAILABLE' | 'SOLD';
 
 export interface InventoryItem {
@@ -9,6 +11,8 @@ export interface InventoryItem {
   rarity: { id: string; name: string; color: string };
   obtainedAt: string;
   status: InventoryStatus;
+  simulatedPrice?: SimulatedPrice | null;
+  marketPrice?: MarketQuote;
 }
 
 export interface InventoryPageResponse {
@@ -17,4 +21,8 @@ export interface InventoryPageResponse {
   size: number;
   totalElements: number;
   totalPages: number;
+  estimatedAvailableTotal: string | null;
+  availableItems: number;
+  unpricedAvailableItems: number;
+  valuationCurrency: 'BRL';
 }

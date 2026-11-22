@@ -28,8 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         CatalogExceptionHandler.class, ApiExceptionHandler.class})
 class CaseControllerTest {
     @Autowired MockMvc mvc;
+    @MockitoBean com.csbet.backend.market.MarketCatalogRepository marketCatalog;
+    @MockitoBean java.time.Clock pricingClock;
     @MockitoBean WeaponCaseRepository cases;
     @MockitoBean CaseItemRepository contents;
+    @MockitoBean com.csbet.backend.market.MarketQueryService market;
+    @MockitoBean com.csbet.backend.pricing.PriceQueryService prices;
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
         String secret = UUID.randomUUID().toString() + UUID.randomUUID();
@@ -65,6 +69,18 @@ class CaseControllerTest {
         verify(cb).like((Expression<String>) null, "%revol!%!_%", '!');
     }
     @Test
+    void priceSortUsesServerPagingAndNameDescendingIsAccepted() throws Exception {
+        when(pricingClock.instant()).thenReturn(java.time.Instant.parse("2026-11-22T12:00:00Z"));
+        when(marketCatalog.cases(anyString(),anyString(),anyString(),any(),any())).thenReturn(new PageImpl<>(List.of(box())));
+        for (String sort:List.of("price_asc","price_desc")) {
+            mvc.perform(get("/api/cases").param("sort",sort)).andExpect(status().isOk());
+            verify(marketCatalog).cases(eq(""),eq("official"),eq(sort),eq(PageRequest.of(0,12)),any());
+        }
+        when(cases.findAll(any(Specification.class),any(Pageable.class))).thenReturn(new PageImpl<>(List.of(box())));
+        mvc.perform(get("/api/cases").param("sort","name_desc")).andExpect(status().isOk());
+        verify(cases).findAll(any(Specification.class),argThat((Pageable p)->p.getSort().getOrderFor("name").isDescending()));
+    }
+    @Test
     void detailIsPublicAndSeparatesOnlyItsOwnSpecialItems() throws Exception {
         WeaponCase box = box();
         var normal = new CosmeticItem(CatalogImportService.SOURCE, "skin-normal-test");
@@ -76,13 +92,18 @@ class CaseControllerTest {
         ReflectionTestUtils.setField(normal, "id", 2L); ReflectionTestUtils.setField(special, "id", 3L);
         when(cases.findBySourceAndExternalId(CatalogImportService.SOURCE, "crate-4880")).thenReturn(Optional.of(box));
         when(contents.findContents(1L)).thenReturn(List.of(new CaseItem(box, normal, false), new CaseItem(box, special, true)));
+        var current = com.csbet.backend.pricing.PriceDtos.CurrentPrice.from(new com.csbet.backend.pricing.SimulatedPrice(
+                normal, new java.math.BigDecimal("100.00"), java.time.LocalDate.now(), java.time.LocalDateTime.now()));
+        when(prices.currentForIds(any())).thenReturn(Map.of(2L, current));
         mvc.perform(get("/api/cases/crate-4880")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].simulatedPrice.currentPrice").value("100.00"))
                 .andExpect(jsonPath("$.items.length()").value(1)).andExpect(jsonPath("$.specialItems.length()").value(1))
                 .andExpect(jsonPath("$.specialItems[0].specialCategory").value("glove"))
                 .andExpect(jsonPath("$.specialItems[0].rarity.id").value("rarity_ancient"))
                 .andExpect(jsonPath("$.specialNotice").isNotEmpty())
                 .andExpect(jsonPath("$.box.passwordHash").doesNotExist());
         verify(contents).findContents(1L);
+        verify(prices).currentForIds(List.of(2L, 3L));
     }
     @Test
     void invalidFiltersAndPaginationReturn400() throws Exception {

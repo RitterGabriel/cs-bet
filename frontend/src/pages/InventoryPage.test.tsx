@@ -10,6 +10,10 @@ const empty: InventoryPageResponse = {
   size: 12,
   totalElements: 0,
   totalPages: 0,
+  estimatedAvailableTotal: '0.00',
+  availableItems: 0,
+  unpricedAvailableItems: 0,
+  valuationCurrency: 'BRL',
 };
 const view = (props: Partial<Parameters<typeof InventoryContent>[0]>) =>
   renderToStaticMarkup(

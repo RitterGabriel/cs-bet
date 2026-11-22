@@ -3,6 +3,8 @@ import type { CSSProperties } from 'react';
 import { Link } from 'react-router';
 import { CalendarDays, LoaderCircle, Package } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { formatBRL } from '../services/market';
+import { MarketPricePanel } from '../components/MarketPricePanel';
 import { ApiError } from '../services/api';
 import { CatalogImage } from '../components/CatalogImage';
 import type {
@@ -52,6 +54,30 @@ export function InventoryPage() {
         </h1>
         <p>Cada item representa uma unidade individual da sua coleção.</p>
       </div>
+      {!loading && !error && data && (
+        <section
+          className="panel inventory-valuation"
+          aria-label="Valor estimado do inventário"
+        >
+          <h2>Valor estimado dos itens disponíveis</h2>
+          <p className="simulated-price">
+            {data.estimatedAvailableTotal === null
+              ? 'Preço indisponível'
+              : formatBRL(data.estimatedAvailableTotal)}
+          </p>
+          <p className="muted">
+            {data.availableItems} unidades disponíveis no inventário completo,
+            independentemente da página ou filtro. Sem valor monetário.
+          </p>
+          {data.unpricedAvailableItems > 0 && (
+            <p>
+              {data.unpricedAvailableItems} itens sem cotação confiável ou sem
+              variante identificada; o total será exibido quando houver
+              referências para todos.
+            </p>
+          )}
+        </section>
+      )}
       <div className="catalog-toolbar inventory-toolbar">
         <span className="toolbar-label">
           <Package size={18} />{' '}
@@ -159,6 +185,11 @@ export function InventoryContent({
               <span className="item-weapon">Unidade #{item.id}</span>
               <h2>{item.name}</h2>
               <span className="item-rarity">{item.rarity.name}</span>
+              <MarketPricePanel
+                quotes={item.marketPrice ? [item.marketPrice] : []}
+                name={item.name}
+                fixedVariant
+              />
               <p className="inventory-date">
                 <CalendarDays size={15} />
                 <span>

@@ -1,4 +1,8 @@
+import { validateMarketQuote } from './market';
+import type { MarketQuote } from './market';
 import { ApiError, request } from './api';
+import { validatePrice } from './pricing';
+import type { SimulatedPrice, PriceRange } from './pricing';
 import type { CaseItem, CatalogCase, Rarity } from '../types/catalog';
 
 export interface OfficialCaseSummary {
@@ -10,8 +14,10 @@ export interface OfficialCaseSummary {
   description: string | null;
   imageUrl: string | null;
   language: string;
+  simulatedItemPrices?: PriceRange | null;
+  marketPrice?: MarketQuote;
 }
-interface OfficialItem {
+export interface OfficialItem {
   id: string;
   name: string;
   weapon: string;
@@ -20,6 +26,8 @@ interface OfficialItem {
   imageUrl: string | null;
   rarity: { id: string; name: string; color: string };
   special: boolean;
+  simulatedPrice?: SimulatedPrice | null;
+  marketPrices?: MarketQuote[];
 }
 interface OfficialCaseDetail {
   box: OfficialCaseSummary;
@@ -73,9 +81,11 @@ export function mapOfficialCase(box: OfficialCaseSummary): CatalogCase {
     isReal: true,
     descriptionFromSource: Boolean(box.description),
     language: box.language,
+    simulatedItemPrices: box.simulatedItemPrices,
+    marketPrice: validateMarketQuote(box.marketPrice),
   };
 }
-function mapItem(item: OfficialItem): CaseItem {
+export function mapItem(item: OfficialItem): CaseItem {
   if (
     !item ||
     typeof item.id !== 'string' ||
@@ -99,6 +109,8 @@ function mapItem(item: OfficialItem): CaseItem {
     weapon: item.weapon,
     weaponType: item.weaponType,
     specialCategory: item.specialCategory,
+    simulatedPrice: validatePrice(item.simulatedPrice),
+    marketPrices: (item.marketPrices ?? []).map(validateMarketQuote),
   };
 }
 export async function listOfficialCases(

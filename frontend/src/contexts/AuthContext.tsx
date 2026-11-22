@@ -24,6 +24,7 @@ interface AuthValue {
   user: UserResponse | null;
   isLoading: boolean;
   notice: string;
+  inventoryEstimate: string | null | undefined;
   login: (data: LoginRequest) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -40,11 +41,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [notice, setNotice] = useState('');
+  const [inventoryEstimate, setInventoryEstimate] = useState<
+    string | null | undefined
+  >(undefined);
   const revision = useRef(0);
 
   const logout = useCallback(() => {
     revision.current++;
     setSession(null);
+    setInventoryEstimate(undefined);
     setIsLoading(false);
     setNotice('');
   }, []);
@@ -52,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const expire = useCallback(() => {
     revision.current++;
     setSession(null);
+    setInventoryEstimate(undefined);
     setIsLoading(false);
     setNotice('Sua sessão expirou. Entre novamente para acessar seus dados.');
   }, []);
@@ -88,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = await fetchInventory(session.token, page, status);
         if (attempt !== revision.current)
           throw new ApiError(401, 'A sessão foi encerrada.');
+        setInventoryEstimate(data.estimatedAvailableTotal);
         return data;
       } catch (error) {
         if (
@@ -148,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: session?.user ?? null,
         isLoading,
         notice,
+        inventoryEstimate,
         login,
         logout,
         refreshUser,

@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { MarketPriceLabel } from './MarketPricePanel';
 import { Box, Layers3 } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import type { CatalogCase } from '../types/catalog';
@@ -27,9 +28,7 @@ export function CaseCard({ item }: { item: CatalogCase }) {
           </span>
           <CatalogImage src={item.image} alt={item.name} remote={item.isReal} />
           <span className="art-watermark">
-            {item.isReal
-              ? 'REFERÊNCIA VISUAL'
-              : 'ILUSTRAÇÃO DEMONSTRATIVA'}
+            {item.isReal ? 'REFERÊNCIA VISUAL' : 'ILUSTRAÇÃO DEMONSTRATIVA'}
           </span>
         </div>
         <div className="case-info">
@@ -46,6 +45,7 @@ export function CaseCard({ item }: { item: CatalogCase }) {
                 : 'Prévia do catálogo. Conteúdo em preparação.'
               : 'Coleção temática fictícia criada pelo CS Bet.'}
           </p>
+          {item.isReal && <MarketPriceLabel quote={item.marketPrice} />}
           <span className="case-cta">
             Ver detalhes <Box size={15} aria-hidden="true" />
           </span>

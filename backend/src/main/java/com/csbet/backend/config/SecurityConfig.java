@@ -20,7 +20,7 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable()).logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/users", "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/health", "/api/cases", "/api/cases/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/health", "/api/cases", "/api/cases/*", "/api/skins/*/price", "/api/skins/*/price/history", "/api/skins/*/market-prices", "/api/cases/*/market-price", "/api/market/variants/*/history", "/api/market/skins").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(errors -> errors
                         .authenticationEntryPoint((req, res, ex) -> unauthorized(res))

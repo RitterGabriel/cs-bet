@@ -13,6 +13,7 @@ import {
 import { listOfficialCases } from '../services/catalog';
 import type { CatalogPageResponse } from '../services/catalog';
 import { ApiError } from '../services/api';
+import { MarketPriceNotice } from '../components/MarketPriceNotice';
 import { CaseCard } from '../components/CaseCard';
 import { cases } from '../data/cases';
 import type { CaseCategory } from '../types/catalog';
@@ -76,7 +77,9 @@ export function CatalogPage({
     );
     return sort === 'name'
       ? result.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
-      : result;
+      : sort === 'name_desc'
+        ? result.sort((a, b) => b.name.localeCompare(a.name, 'pt-BR'))
+        : result;
   }, [category, custom, query, sort, remote]);
   return (
     <>
@@ -182,6 +185,13 @@ export function CatalogPage({
             {custom ? 'CATÁLOGO DEMONSTRATIVO' : 'DADOS PÚBLICOS · BYMYKEL'}
           </span>
         </div>
+        {!custom && (
+          <MarketPriceNotice
+            quotes={remote.content.flatMap((item) =>
+              item.marketPrice ? [item.marketPrice] : [],
+            )}
+          />
+        )}
         <div className="catalog-toolbar">
           <div className="toolbar-label">
             {custom ? <Layers3 size={18} /> : <Box size={18} />}{' '}
@@ -214,7 +224,14 @@ export function CatalogPage({
                 aria-label="Ordenar catálogo"
               >
                 <option value="featured">Em destaque</option>
-                <option value="name">Nome: A–Z</option>
+                <option value="name">Nome A–Z</option>
+                <option value="name_desc">Nome Z–A</option>
+                {!custom && (
+                  <>
+                    <option value="price_desc">Maior preço</option>
+                    <option value="price_asc">Menor preço</option>
+                  </>
+                )}
               </select>
             </label>
           </div>

@@ -8,6 +8,10 @@ const page = {
   size: 12,
   totalElements: 0,
   totalPages: 0,
+  estimatedAvailableTotal: '0.00',
+  availableItems: 0,
+  unpricedAvailableItems: 0,
+  valuationCurrency: 'BRL',
 };
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock);

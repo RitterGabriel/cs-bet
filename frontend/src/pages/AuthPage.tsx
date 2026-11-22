@@ -10,6 +10,7 @@ import {
   LockKeyhole,
   ShieldCheck,
 } from 'lucide-react';
+import { SimulationNotice } from '../components/SimulationNotice';
 import { useAuth } from '../contexts/AuthContext';
 import { api, ApiError } from '../services/api';
 import { safeReturnPath, validateCredentials } from '../services/validation';
@@ -119,7 +120,7 @@ export function AuthPage({ register = false }: { register?: boolean }) {
           <ShieldCheck size={22} />
           <span>
             100% educacional
-            <small>Créditos fictícios. Nenhum valor monetário.</small>
+            <small>Saldo virtual. Nenhum valor monetário.</small>
           </span>
         </div>
       </aside>
@@ -133,7 +134,7 @@ export function AuthPage({ register = false }: { register?: boolean }) {
         <p className="muted">
           {register
             ? 'Seu perfil é o próximo passo dessa jornada.'
-            : 'Acesse seu perfil e consulte seus créditos fictícios.'}
+            : 'Acesse seu perfil e consulte seu saldo virtual.'}
         </p>
         {success && (
           <div className="success-message" role="status">
@@ -224,6 +225,7 @@ export function AuthPage({ register = false }: { register?: boolean }) {
                 </label>
               </>
             )}
+            {register && <SimulationNotice />}
             <button type="submit" className="button primary full-width">
               {busy ? (
                 <>

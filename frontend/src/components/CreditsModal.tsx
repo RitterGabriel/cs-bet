@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Coins, Info, X } from 'lucide-react';
-import { formatCredits } from '../services/validation';
+import { formatVirtualBalance } from '../services/market';
+import { SimulationNotice } from './SimulationNotice';
 
 export function CreditsModal({
   balance,
@@ -36,7 +37,7 @@ export function CreditsModal({
         <button
           className="icon-button close-button"
           onClick={onClose}
-          aria-label="Fechar créditos fictícios"
+          aria-label="Fechar saldo virtual"
           autoFocus
         >
           <X />
@@ -44,20 +45,16 @@ export function CreditsModal({
         <span className="feature-icon">
           <Coins size={28} />
         </span>
-        <h2 id="credits-title">Créditos fictícios</h2>
+        <h2 id="credits-title">Saldo virtual</h2>
         <p className="muted">Seu saldo atual na simulação</p>
         <strong className="balance-large">
-          {formatCredits(balance)} <small>créditos</small>
+          {formatVirtualBalance(balance)}
         </strong>
         <div className="info-box">
           <Info size={20} />
-          <p>
-            Os créditos são gratuitos, exclusivos para simulação e não possuem
-            valor monetário. Não podem ser comprados, sacados ou convertidos em
-            prêmios.
-          </p>
+          <SimulationNotice />
         </div>
-        <div className="coming-soon">Adição de créditos em breve</div>
+        <div className="coming-soon">Adição de saldo em breve</div>
       </div>
     </dialog>
   );

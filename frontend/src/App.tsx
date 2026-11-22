@@ -7,6 +7,7 @@ import { CaseDetailsPage } from './pages/CaseDetailsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { InventoryPage } from './pages/InventoryPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { MarketPage } from './pages/MarketPage';
 import { StatisticsPage } from './pages/StatisticsPage';
 
 export function App() {
@@ -22,6 +23,7 @@ export function App() {
           path="custom"
           element={<CatalogPage key="custom" category="custom" />}
         />
+        <Route path="market" element={<MarketPage />} />
         <Route path="statistics" element={<StatisticsPage />} />
         <Route path="cases/:id" element={<CaseDetailsPage />} />
         <Route path="login" element={<AuthPage key="login" />} />

@@ -28,11 +28,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(InventoryController.class)
 @Import({SecurityConfig.class, JwtConfig.class, PasswordConfig.class, TokenService.class,
-        InventoryService.class, InventoryExceptionHandler.class, ApiExceptionHandler.class})
+        com.csbet.backend.pricing.PricingConfig.class, InventoryService.class, InventoryExceptionHandler.class, ApiExceptionHandler.class})
 class InventoryControllerTest {
     @Autowired MockMvc mvc;
     @Autowired TokenService tokens;
     @MockitoBean InventoryRepository repository;
+    @MockitoBean com.csbet.backend.market.MarketQueryService market;
+    @MockitoBean com.csbet.backend.pricing.PriceQueryService prices;
     private final Map<Long, List<InventoryItem>> owned = new HashMap<>();
 
     @DynamicPropertySource
@@ -48,6 +50,8 @@ class InventoryControllerTest {
         ReflectionTestUtils.setField(skin, "id", 50L);
         owned.put(1L, List.of(item(101L, 1L, skin), item(102L, 1L, skin)));
         owned.put(2L, List.of(item(201L, 2L, skin)));
+        when(repository.estimateAvailable(anyLong(), eq(InventoryStatus.AVAILABLE), any(java.time.LocalDateTime.class))).thenReturn(
+                new InventoryValuation(BigDecimal.ZERO, 0L, 0L));
         when(repository.findByOwnerId(anyLong(), any(Pageable.class))).thenAnswer(call ->
                 page(owned.getOrDefault(call.getArgument(0), List.of()), call.getArgument(1)));
         when(repository.findByOwnerIdAndStatus(anyLong(), any(), any(Pageable.class))).thenAnswer(call -> {

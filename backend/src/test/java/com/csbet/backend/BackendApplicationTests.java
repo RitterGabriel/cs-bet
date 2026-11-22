@@ -7,11 +7,18 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-@SpringBootTest(properties = "spring.autoconfigure.exclude="
+@SpringBootTest(properties = {"csbet.pricing.schedule-enabled=false", "spring.autoconfigure.exclude="
         + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
-        + "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration")
+        + "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration"})
 class BackendApplicationTests {
+    @MockitoBean com.csbet.backend.market.MarketCatalogRepository marketCatalog;
     @MockitoBean UserRepository repository;
+    @MockitoBean com.csbet.backend.market.MarketVariantRepository marketVariants;
+    @MockitoBean com.csbet.backend.market.MarketHistoryRepository marketHistory;
+    @MockitoBean com.csbet.backend.market.MarketControlRepository marketControl;
+    @MockitoBean com.csbet.backend.pricing.SimulatedPriceRepository prices;
+    @MockitoBean com.csbet.backend.pricing.PriceHistoryRepository priceHistory;
+    @MockitoBean com.csbet.backend.pricing.PriceControlRepository priceControl;
     @MockitoBean com.csbet.backend.inventory.InventoryRepository inventory;
     @MockitoBean com.csbet.backend.casecatalog.WeaponCaseRepository cases;
     @MockitoBean com.csbet.backend.casecatalog.CaseItemRepository contents;

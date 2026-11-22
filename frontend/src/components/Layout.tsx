@@ -12,12 +12,12 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { formatCredits } from '../services/validation';
+import { formatBRL, formatVirtualBalance } from '../services/market';
 import { ProfileMenu } from './ProfileMenu';
 import { CreditsModal } from './CreditsModal';
 
 export function Layout() {
-  const { user, notice, dismissNotice } = useAuth();
+  const { user, notice, dismissNotice, inventoryEstimate } = useAuth();
   const [creditsOpen, setCreditsOpen] = useState(false);
   const location = useLocation();
   const main = useRef<HTMLElement>(null);
@@ -64,8 +64,8 @@ export function Layout() {
               >
                 <Coins size={20} />
                 <span>
-                  Créditos fictícios
-                  <strong>{formatCredits(user.balance)}</strong>
+                  Saldo virtual
+                  <strong>{formatVirtualBalance(user.balance)}</strong>
                 </span>
               </button>
             ) : (
@@ -76,7 +76,7 @@ export function Layout() {
               >
                 <Coins size={20} />
                 <span>
-                  Créditos fictícios<strong>Entre para consultar</strong>
+                  Saldo virtual<strong>Entre para consultar</strong>
                 </span>
               </Link>
             )}
@@ -87,7 +87,14 @@ export function Layout() {
             >
               <Package size={20} />
               <span>
-                Inventário<strong>Em breve</strong>
+                Valor do inventário
+                <strong>
+                  {inventoryEstimate === undefined
+                    ? 'Consultar'
+                    : inventoryEstimate === null
+                      ? 'Preço indisponível'
+                      : formatBRL(inventoryEstimate)}
+                </strong>
               </span>
             </Link>
             <ProfileMenu />
@@ -107,13 +114,16 @@ export function Layout() {
               <NavLink to="/custom">
                 <Layers3 size={18} /> Personalizadas
               </NavLink>
+              <NavLink to="/market">
+                <Package size={18} /> Mercado
+              </NavLink>
               <NavLink to="/statistics">
                 <BarChart3 size={18} /> Estatísticas
               </NavLink>
             </nav>
             <span className="educational-badge">
-              <FlaskConical size={15} /> Projeto educacional <span>•</span> Sem
-              dinheiro real
+              <FlaskConical size={15} /> Simulação <span>•</span> Sem dinheiro
+              real
             </span>
           </div>
         </div>
@@ -155,7 +165,7 @@ export function Layout() {
               Uma experiência exclusivamente educacional.
               <br />
               <span>
-                Créditos e itens virtuais sem valor monetário. Sem pagamentos,
+                Saldos e itens virtuais sem valor monetário. Sem pagamentos,
                 saques ou prêmios.
               </span>
             </p>

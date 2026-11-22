@@ -1,47 +1,32 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
-import { Box, ChevronRight, Info, Layers3, Sparkles } from 'lucide-react';
-import type { CSSProperties } from 'react';
-import type { CatalogCase, CaseItem } from '../types/catalog';
-import { cases, categoryLabels } from '../data/cases';
-import { getOfficialCase } from '../services/catalog';
-import { ApiError } from '../services/api';
-import { CatalogImage } from '../components/CatalogImage';
-import { NotFoundPage } from './NotFoundPage';
-
-const rarityLabels = {
-  industrial: 'Industrial',
-  'mil-spec': 'Mil-Spec',
-  restricted: 'Restrito',
-  classified: 'Confidencial',
-  covert: 'Oculto',
-  special: 'Especial',
-};
-const rarityOrder = [
-  'rarity_common_weapon',
-  'rarity_uncommon_weapon',
-  'rarity_rare_weapon',
-  'rarity_mythical_weapon',
-  'rarity_legendary_weapon',
-  'rarity_ancient_weapon',
-  'rarity_ancient',
-];
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router";
+import { Box, ChevronRight, Info, Layers3 } from "lucide-react";
+import type { CSSProperties } from "react";
+import type { CatalogCase } from "../types/catalog";
+import { cases, categoryLabels } from "../data/cases";
+import { getOfficialCase } from "../services/catalog";
+import { ApiError } from "../services/api";
+import { CatalogImage } from "../components/CatalogImage";
+import { MarketPriceNotice } from "../components/MarketPriceNotice";
+import { MarketPricePanel } from "../components/MarketPricePanel";
+import { SkinGrid } from "../components/SkinGrid";
+import { NotFoundPage } from "./NotFoundPage";
 
 export function CaseDetailsPage() {
-  const { id = '' } = useParams();
+  const { id = "" } = useParams();
   const local = cases.find(
-    (entry) => entry.category === 'custom' && entry.id === id,
+    (entry) => entry.category === "custom" && entry.id === id,
   );
   const [remote, setRemote] = useState<CatalogCase | null>(null);
   const [loading, setLoading] = useState(!local);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
   const [retry, setRetry] = useState(0);
   useEffect(() => {
     if (local) return;
     let active = true;
     setLoading(true);
-    setError('');
+    setError("");
     setNotFound(false);
     getOfficialCase(id)
       .then((item) => {
@@ -55,7 +40,7 @@ export function CaseDetailsPage() {
           setError(
             failure instanceof ApiError
               ? failure.message
-              : 'Não foi possível carregar esta caixa.',
+              : "Não foi possível carregar esta caixa.",
           );
       })
       .finally(() => {
@@ -98,52 +83,16 @@ export function CaseDetailsPage() {
   );
 }
 
-function ItemCard({ entry, special }: { entry: CaseItem; special?: boolean }) {
-  return (
-    <article
-      className={`item-card ${special ? 'special-item' : ''} rarity-${entry.rarity}`}
-      style={
-        {
-          '--item-rarity': entry.rarityData?.color ?? '#8aabc8',
-        } as CSSProperties
-      }
-    >
-      <CatalogImage src={entry.image} alt={entry.name} remote item />
-      <div className="item-card-copy">
-        <span className="item-weapon">{entry.weapon}</span>
-        <h3>{entry.name}</h3>
-        <span className="item-rarity">
-          {entry.rarityData?.name ?? rarityLabels[entry.rarity]}
-        </span>
-        {special && (
-          <span className="special-label">
-            {entry.specialCategory === 'knife'
-              ? 'Faca especial'
-              : entry.specialCategory === 'glove'
-                ? 'Luvas especiais'
-                : 'Item especial'}
-          </span>
-        )}
-      </div>
-    </article>
-  );
-}
-
 function CaseDetailsContent({ item }: { item: CatalogCase }) {
-  const grouped = [
-    ...new Set(item.items.map((entry) => entry.rarityData?.id ?? entry.rarity)),
-  ]
-    .sort((a, b) => rarityOrder.indexOf(a) - rarityOrder.indexOf(b))
-    .map((id) => ({
-      id,
-      entries: item.items.filter(
-        (entry) => (entry.rarityData?.id ?? entry.rarity) === id,
-      ),
-    }));
+  const skins = [
+    ...new Map(
+      [...item.items, ...item.specialItems].map((entry) => [entry.id, entry]),
+    ).values(),
+  ];
   return (
     <div className="container page-content">
       <nav className="breadcrumbs" aria-label="Localização">
-        <Link to={item.category === 'official' ? '/official' : '/custom'}>
+        <Link to={item.category === "official" ? "/official" : "/custom"}>
           Catálogo
         </Link>
         <ChevronRight size={14} />
@@ -151,19 +100,19 @@ function CaseDetailsContent({ item }: { item: CatalogCase }) {
       </nav>
       <section
         className="case-detail-hero"
-        style={{ '--case-accent': item.accent } as CSSProperties}
+        style={{ "--case-accent": item.accent } as CSSProperties}
       >
         <div className="detail-art">
           <CatalogImage src={item.image} alt={item.name} remote={item.isReal} />
           <span>
             {item.isReal
-              ? 'IMAGEM DE REFERÊNCIA SUJEITA A DIREITOS · RESERVA ILUSTRATIVA QUANDO INDISPONÍVEL'
-              : 'ILUSTRAÇÃO DEMONSTRATIVA'}
+              ? "IMAGEM DE REFERÊNCIA SUJEITA A DIREITOS · RESERVA ILUSTRATIVA QUANDO INDISPONÍVEL"
+              : "ILUSTRAÇÃO DEMONSTRATIVA"}
           </span>
         </div>
         <div className="detail-copy">
           <span className="pill">
-            {item.category === 'official' ? (
+            {item.category === "official" ? (
               <Box size={15} />
             ) : (
               <Layers3 size={15} />
@@ -172,8 +121,18 @@ function CaseDetailsContent({ item }: { item: CatalogCase }) {
           </span>
           <h1>{item.name}</h1>
           {item.isReal && (
+            <MarketPricePanel
+              itemType="case"
+              quotes={item.marketPrice ? [item.marketPrice] : []}
+              name={item.name}
+            />
+          )}
+          {item.isReal && (
             <span className="eyebrow">
-              {item.descriptionFromSource ? 'DESCRIÇÃO DA FONTE' : 'CATÁLOGO OFICIAL'} · {item.language}
+              {item.descriptionFromSource
+                ? "DESCRIÇÃO DA FONTE"
+                : "CATÁLOGO OFICIAL"}{" "}
+              · {item.language}
             </span>
           )}
           <p>{item.description}</p>
@@ -186,85 +145,50 @@ function CaseDetailsContent({ item }: { item: CatalogCase }) {
           </div>
         </div>
       </section>
+      {item.isReal && (
+        <MarketPriceNotice
+          quotes={[
+            ...(item.marketPrice ? [item.marketPrice] : []),
+            ...[...item.items, ...item.specialItems].flatMap(
+              (entry) => entry.marketPrices ?? [],
+            ),
+          ]}
+        />
+      )}
       <section className="panel" aria-labelledby="contents-title">
         <div className="panel-title">
           <Box size={21} />
           <h2 id="contents-title">Conteúdo da caixa</h2>
           <span className="mini-tag">
-            {item.items.length
-              ? `${item.items.length} itens na fonte`
-              : 'Em preparação'}
+            {skins.length ? `${skins.length} itens na fonte` : "Em preparação"}
           </span>
         </div>
-        {grouped.length ? (
-          grouped.map((group) => (
-            <section
-              className="rarity-group"
-              key={group.id}
-              aria-label={
-                group.entries[0].rarityData?.name ??
-                rarityLabels[group.entries[0].rarity]
-              }
-            >
-              <h3
-                className={`rarity-group-title rarity-${group.entries[0].rarity}`}
-              >
-                {group.entries[0].rarityData?.name ??
-                  rarityLabels[group.entries[0].rarity]}{' '}
-                <span>{group.entries.length}</span>
-              </h3>
-              <div className="item-grid">
-                {group.entries.map((entry) => (
-                  <ItemCard key={entry.id} entry={entry} />
-                ))}
-              </div>
-            </section>
-          ))
+        {skins.length ? (
+          <SkinGrid items={skins} />
         ) : (
           <div className="empty-state compact">
             <Box size={35} />
             <h3>Os detalhes estão a caminho</h3>
             <p>
               {item.isReal
-                ? 'O conteúdo regular não foi informado. Esta informação não representa um conjunto completo.'
-                : 'Os itens desta coleção fictícia ainda estão em preparação.'}
+                ? "O conteúdo regular não foi informado. Esta informação não representa um conjunto completo."
+                : "Os itens desta coleção fictícia ainda estão em preparação."}
             </p>
           </div>
         )}
       </section>
-      <section className="panel special-panel" aria-labelledby="special-title">
-        <div className="panel-title">
-          <Sparkles size={21} />
-          <h2 id="special-title">Itens especiais desta caixa</h2>
-          <span className="mini-tag">
-            {item.specialItems.length} referências
-          </span>
-        </div>
-        <div className="info-box">
-          <Info size={20} />
-          <p>
-            {item.specialNotice ??
-              'Não há dados de itens especiais cadastrados para esta coleção fictícia.'}
-          </p>
-        </div>
-        {item.specialItems.length > 0 && (
-          <div className="item-grid special-grid">
-            {item.specialItems.map((entry) => (
-              <ItemCard key={entry.id} entry={entry} special />
-            ))}
-          </div>
-        )}
-      </section>
+      {item.specialNotice && (
+        <p className="catalog-footnote">{item.specialNotice}</p>
+      )}
       <section className="panel">
         <div className="panel-title">
           <Layers3 size={21} />
           <h2>Raridade não é probabilidade</h2>
         </div>
         <p className="muted">
-          As cores identificam as categorias informadas pela fonte. Itens
-          especiais são destacados em dourado como grupo da caixa; a raridade
-          original de cada item continua indicada. Não atribuímos percentuais
-          por item ou por raridade sem uma fonte verificável.
+          As cores identificam as categorias informadas pela fonte. A borda e a
+          etiqueta de cada item preservam sua raridade original. Não atribuímos
+          percentuais por item ou por raridade sem uma fonte verificável.
         </p>
         <Link className="text-link" to="/statistics">
           Conheça os conceitos estatísticos
@@ -273,19 +197,20 @@ function CaseDetailsContent({ item }: { item: CatalogCase }) {
       {item.isReal && (
         <div className="catalog-source">
           <p>
-            Dados:{' '}
+            Dados:{" "}
             <a
               href="https://github.com/ByMykel/CSGO-API"
               target="_blank"
               rel="noreferrer"
             >
               ByMykel/CSGO-API
-            </a>{' '}
-            · MIT · idioma {item.language} · revisão{' '}
+            </a>{" "}
+            · MIT · idioma {item.language} · revisão{" "}
             <code>{item.sourceRevision?.slice(0, 12)}</code>
           </p>
           <p>
-            {item.imageNotice} Imagens indisponíveis recebem uma ilustração local.
+            {item.imageNotice} Imagens indisponíveis recebem uma ilustração
+            local.
           </p>
           <p>
             Conteúdo conforme o snapshot da fonte, sem garantia de variantes

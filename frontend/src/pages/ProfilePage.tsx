@@ -12,7 +12,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { formatCredits } from '../services/validation';
+import { formatVirtualBalance } from '../services/market';
 import { ApiError } from '../services/api';
 
 export function ProfilePage() {
@@ -89,15 +89,13 @@ export function ProfilePage() {
           </div>
           <div>
             <dt>
-              <Coins size={17} /> Créditos fictícios
+              <Coins size={17} /> Saldo virtual
             </dt>
-            <dd className="cyan-text">
-              {formatCredits(user.balance)} <small>créditos</small>
-            </dd>
+            <dd className="cyan-text">{formatVirtualBalance(user.balance)}</dd>
           </div>
         </dl>
         <p className="muted">
-          Créditos exclusivos para simulação, sem valor monetário.
+          Saldo exclusivamente virtual para simulação, sem valor monetário.
         </p>
       </section>
       <div className="education-grid">

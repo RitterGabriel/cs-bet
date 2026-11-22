@@ -1,3 +1,6 @@
+import type { MarketQuote } from '../services/market';
+import type { SimulatedPrice, PriceRange } from '../services/pricing';
+
 export type CaseCategory = 'official' | 'custom';
 export type Rarity =
   | 'industrial'
@@ -12,6 +15,8 @@ export interface CaseItem {
   name: string;
   image: string;
   rarity: Rarity;
+  simulatedPrice?: SimulatedPrice | null;
+  marketPrices?: MarketQuote[];
   rarityData?: { id: string; name: string; color: string };
   weapon?: string;
   weaponType?: string;
@@ -31,6 +36,8 @@ export interface CatalogCase {
   specialItems: CaseItem[];
   specialKind?: 'knives' | 'gloves';
   isReal?: boolean;
+  simulatedItemPrices?: PriceRange | null;
+  marketPrice?: MarketQuote;
   descriptionFromSource?: boolean;
   language?: string;
   source?: string;
