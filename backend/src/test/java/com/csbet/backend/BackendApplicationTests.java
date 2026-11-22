@@ -11,6 +11,7 @@ import org.springframework.test.context.DynamicPropertySource;
         + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
         + "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration"})
 class BackendApplicationTests {
+    @MockitoBean com.csbet.backend.statistics.StatisticsRepository statistics;
     @MockitoBean com.csbet.backend.market.MarketCatalogRepository marketCatalog;
     @MockitoBean UserRepository repository;
     @MockitoBean com.csbet.backend.wallet.WalletMovementRepository movements;

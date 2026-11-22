@@ -116,10 +116,9 @@ export function ProfileMenu() {
               <Link to="/inventory" role="menuitem">
                 <Package size={17} /> Meu inventário
               </Link>
-              <button role="menuitem" disabled>
-                <BarChart3 size={17} /> Minhas estatísticas{' '}
-                <small>Em breve</small>
-              </button>
+              <Link to="/statistics" role="menuitem">
+                <BarChart3 size={17} /> Minhas estatísticas
+              </Link>
               <div className="menu-divider" />
               <button
                 role="menuitem"

@@ -118,7 +118,7 @@ export function CatalogPage({
                 <Box size={18} /> Explorar {custom ? 'coleções' : 'catálogo'}
               </a>
               <Link className="text-link" to="/statistics">
-                <BarChartIcon /> Entenda as probabilidades
+                <BarChartIcon /> Minhas estatísticas
               </Link>
             </div>
             <div className="hero-notes">

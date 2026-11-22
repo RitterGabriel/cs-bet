@@ -113,8 +113,8 @@ export function ProfilePage() {
           },
           {
             icon: History,
-            title: 'Histórico de simulações',
-            description: 'Um espaço para suas futuras experiências.',
+            title: 'Histórico da conta',
+            description: 'Consulte seus créditos, itens recebidos e vendas registradas.',
           },
         ].map(({ icon: Icon, title, description }) => (
           <section className="panel" key={title}>
@@ -128,7 +128,7 @@ export function ProfilePage() {
                 Meu inventário
               </Link>
             ) : (
-              <span className="coming-soon">Em breve</span>
+              <Link className="button secondary" to="/statistics">Ver estatísticas e histórico</Link>
             )}
           </section>
         ))}
