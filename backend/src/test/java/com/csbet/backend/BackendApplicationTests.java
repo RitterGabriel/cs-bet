@@ -13,6 +13,7 @@ import org.springframework.test.context.DynamicPropertySource;
 class BackendApplicationTests {
     @MockitoBean com.csbet.backend.market.MarketCatalogRepository marketCatalog;
     @MockitoBean UserRepository repository;
+    @MockitoBean com.csbet.backend.wallet.WalletMovementRepository movements;
     @MockitoBean com.csbet.backend.market.MarketVariantRepository marketVariants;
     @MockitoBean com.csbet.backend.market.MarketHistoryRepository marketHistory;
     @MockitoBean com.csbet.backend.market.MarketControlRepository marketControl;

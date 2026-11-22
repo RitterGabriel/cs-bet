@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import {
   Activity,
@@ -14,11 +14,9 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { formatBRL, formatVirtualBalance } from '../services/market';
 import { ProfileMenu } from './ProfileMenu';
-import { CreditsModal } from './CreditsModal';
 
 export function Layout() {
   const { user, notice, dismissNotice, inventoryEstimate } = useAuth();
-  const [creditsOpen, setCreditsOpen] = useState(false);
   const location = useLocation();
   const main = useRef<HTMLElement>(null);
   const previousPath = useRef(location.pathname);
@@ -27,7 +25,6 @@ export function Layout() {
     if (previousPath.current !== location.pathname)
       main.current?.focus({ preventScroll: true });
     previousPath.current = location.pathname;
-    setCreditsOpen(false);
   }, [location.pathname]);
 
   return (
@@ -58,20 +55,20 @@ export function Layout() {
           </div>
           <div className="header-account">
             {user ? (
-              <button
+              <Link
+                to="/wallet"
                 className="account-stat balance-button"
-                onClick={() => setCreditsOpen(true)}
               >
                 <Coins size={20} />
                 <span>
                   Saldo virtual
                   <strong>{formatVirtualBalance(user.balance)}</strong>
                 </span>
-              </button>
+              </Link>
             ) : (
               <Link
                 to="/login"
-                state={{ from: '/profile' }}
+                state={{ from: '/wallet' }}
                 className="account-stat"
               >
                 <Coins size={20} />
@@ -180,12 +177,6 @@ export function Layout() {
           </span>
         </div>
       </footer>
-      {creditsOpen && user && (
-        <CreditsModal
-          balance={user.balance}
-          onClose={() => setCreditsOpen(false)}
-        />
-      )}
     </>
   );
 }

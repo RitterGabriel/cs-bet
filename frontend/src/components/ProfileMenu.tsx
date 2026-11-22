@@ -124,7 +124,7 @@ export function ProfileMenu() {
               <button
                 role="menuitem"
                 onClick={() => {
-                  logout();
+                  void logout();
                   setOpen(false);
                 }}
               >

@@ -1,3 +1,4 @@
+import { WalletPage } from './pages/WalletPage';
 import { Route, Routes } from 'react-router';
 import { Layout } from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -29,6 +30,7 @@ export function App() {
         <Route path="login" element={<AuthPage key="login" />} />
         <Route path="register" element={<AuthPage key="register" register />} />
         <Route element={<ProtectedRoute />}>
+          <Route path="wallet" element={<WalletPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="inventory" element={<InventoryPage />} />
         </Route>

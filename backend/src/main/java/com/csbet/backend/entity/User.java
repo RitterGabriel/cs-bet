@@ -33,7 +33,7 @@ public class User {
 	@Column(nullable = false, length = 255)
 	private String passwordHash;
 
-	@Column(nullable = false, precision = 15, scale = 2)
+	@Column(nullable = false, precision = 18, scale = 2)
 	private BigDecimal balance;
 
 	@Column(nullable = false)
@@ -56,6 +56,15 @@ public class User {
 	public String getEmail() { return email; }
 	public BigDecimal getBalance() { return balance; }
 	public LocalDateTime getCreatedAt() { return createdAt; }
+
+	public void addCredits(BigDecimal amount) {
+		if (amount == null || amount.signum() <= 0 || amount.scale() > 2)
+			throw new IllegalArgumentException("Valor de crédito inválido.");
+		BigDecimal result = balance.add(amount);
+		if (result.compareTo(new BigDecimal("9999999999999999.99")) > 0)
+			throw new IllegalArgumentException("Limite de saldo atingido.");
+		balance = result;
+	}
 
 	protected User() {
 	}

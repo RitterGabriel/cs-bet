@@ -241,8 +241,7 @@ export function AuthPage({ register = false }: { register?: boolean }) {
         </form>
         {!register && (
           <p className="session-hint">
-            <LockKeyhole size={13} /> Por segurança, recarregar a página encerra
-            sua sessão.
+            <LockKeyhole size={13} /> Sua sessão permanece ao atualizar a página e expira após uma hora.
           </p>
         )}
         <p className="auth-switch">

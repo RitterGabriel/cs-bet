@@ -8,6 +8,8 @@ import {
 } from 'react';
 import type { ReactNode } from 'react';
 import { api, ApiError } from '../services/api';
+import { walletApi } from '../services/wallet';
+import type { WalletBalance, WalletHistory } from '../services/wallet';
 import { fetchInventory } from '../services/inventory';
 import type {
   InventoryPageResponse,
@@ -26,9 +28,12 @@ interface AuthValue {
   notice: string;
   inventoryEstimate: string | null | undefined;
   login: (data: LoginRequest) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   dismissNotice: () => void;
+  getWalletBalance: () => Promise<WalletBalance>;
+  getWalletHistory: (page: number) => Promise<WalletHistory>;
+  addCredits: (amount: string, requestId: string) => Promise<WalletBalance>;
   getInventory: (
     page: number,
     status?: InventoryStatus,
@@ -37,21 +42,51 @@ interface AuthValue {
 const AuthContext = createContext<AuthValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // A sessão existe somente na memória deste provider. Recarregar exige novo login.
+  // O JWT fica em memória; o cookie HttpOnly permite restaurá-lo após recarregar.
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [notice, setNotice] = useState('');
   const [inventoryEstimate, setInventoryEstimate] = useState<
     string | null | undefined
   >(undefined);
   const revision = useRef(0);
 
-  const logout = useCallback(() => {
-    revision.current++;
-    setSession(null);
-    setInventoryEstimate(undefined);
-    setIsLoading(false);
-    setNotice('');
+  const logout = useCallback(async () => {
+    const attempt = ++revision.current;
+    setIsLoading(true);
+    try {
+      await api.logout();
+      if (attempt !== revision.current) return;
+      setSession(null);
+      setInventoryEstimate(undefined);
+      setNotice('');
+    } catch {
+      if (attempt === revision.current)
+        setNotice('Não foi possível encerrar a sessão no servidor. Tente sair novamente.');
+    } finally {
+      if (attempt === revision.current) setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const attempt = revision.current;
+    async function restore() {
+      try {
+        const result = await api.restoreSession();
+        const expiresAt = Date.now() + result.expiresIn * 1000;
+        const user = await api.me(result.accessToken);
+        if (active && attempt === revision.current && Date.now() < expiresAt)
+          setSession({ token: result.accessToken, user, expiresAt });
+      } catch (error) {
+        if (active && attempt === revision.current && !(error instanceof ApiError && error.status === 401))
+          setNotice('Não foi possível restaurar a sessão. Atualize a página para tentar novamente.');
+      } finally {
+        if (active && attempt === revision.current) setIsLoading(false);
+      }
+    }
+    void restore();
+    return () => { active = false; };
   }, []);
 
   const expire = useCallback(() => {
@@ -109,6 +144,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [session, expire],
   );
 
+  const token = session?.token;
+  const expiresAt = session?.expiresAt;
+  const walletCall = useCallback(async <T,>(action: (token: string) => Promise<T>): Promise<T> => {
+    if (!token || !expiresAt || Date.now() >= expiresAt) {
+      expire();
+      throw new ApiError(401, 'Entre novamente para acessar a carteira.');
+    }
+    const attempt = revision.current;
+    try {
+      const result = await action(token);
+      if (attempt !== revision.current) throw new ApiError(401, 'A sessão foi encerrada.');
+      return result;
+    } catch (error) {
+      if (attempt === revision.current && error instanceof ApiError && error.status === 401) expire();
+      throw error;
+    }
+  }, [token, expiresAt, expire]);
+  const getWalletBalance = useCallback(async () => {
+    const data = await walletCall(walletApi.balance);
+    setSession(current => current && current.token === token ? { ...current, user: { ...current.user, balance: Number(data.balance) } } : current);
+    return data;
+  }, [walletCall, token]);
+  const getWalletHistory = useCallback((page: number) => walletCall(token => walletApi.history(token, page)), [walletCall]);
+  const addCredits = useCallback(async (amount: string, requestId: string) => {
+    const data = await walletCall(token => walletApi.add(token, amount, requestId));
+    setSession(current => current && current.token === token ? { ...current, user: { ...current.user, balance: Number(data.balance) } } : current);
+    return data;
+  }, [walletCall, token]);
+
   async function login(data: LoginRequest) {
     const attempt = ++revision.current;
     setIsLoading(true);
@@ -160,6 +224,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         refreshUser,
         getInventory,
+        getWalletBalance,
+        getWalletHistory,
+        addCredits,
         dismissNotice: () => setNotice(''),
       }}
     >

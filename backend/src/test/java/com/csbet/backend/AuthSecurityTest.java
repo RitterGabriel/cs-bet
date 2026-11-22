@@ -51,6 +51,7 @@ class AuthSecurityTest {
         ReflectionTestUtils.setField(user, "id", 1L);
         when(repository.findByEmail("player@example.com")).thenReturn(Optional.of(user));
         when(repository.findById(1L)).thenReturn(Optional.of(user));
+        when(repository.existsById(1L)).thenReturn(true);
     }
 
     @Test
@@ -62,7 +63,8 @@ class AuthSecurityTest {
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.expiresIn").value(3600))
                 .andExpect(jsonPath("$.*", hasSize(3)))
-                .andExpect(header().doesNotExist("Set-Cookie"));
+                .andExpect(header().string("Set-Cookie", allOf(containsString("HttpOnly"), containsString("SameSite=Strict"), containsString("Path=/api/auth"), containsString("Max-Age=3600"))))
+                .andExpect(header().string("Cache-Control", containsString("no-store")));
         var jwt = decoder.decode(tokens.issue(1L).accessToken());
         assertThat(jwt.getSubject()).isEqualTo("1");
         assertThat(Duration.between(jwt.getIssuedAt(), jwt.getExpiresAt()).toSeconds()).isEqualTo(3600);
@@ -106,6 +108,61 @@ class AuthSecurityTest {
                 .andExpect(header().doesNotExist("Set-Cookie"));
         verify(repository).findById(1L);
         mvc.perform(get("/api/users/me")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void restoresSameTokenWithoutExtendingItsExpiration() throws Exception {
+        String token = tokens.issue(1L).accessToken();
+        mvc.perform(get("/api/auth/session").header("X-CSBET-Session", "1")
+                        .cookie(new jakarta.servlet.http.Cookie("CSBET_SESSION", token)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.accessToken").value(token))
+                .andExpect(jsonPath("$.expiresIn", greaterThan(0)))
+                .andExpect(jsonPath("$.expiresIn", lessThanOrEqualTo(3600)))
+                .andExpect(header().string("Cache-Control", containsString("no-store")))
+                .andExpect(header().doesNotExist("Set-Cookie"));
+        verify(repository).existsById(1L);
+    }
+
+    @Test
+    void restorationRejectsMissingInvalidExpiredAndDeletedUserSessions() throws Exception {
+        mvc.perform(get("/api/auth/session").header("X-CSBET-Session", "1"))
+                .andExpect(status().isUnauthorized());
+        for (String token : List.of("invalid", signed("1", Instant.now().minusSeconds(1), "access"),
+                tokens.issue(2L).accessToken())) {
+            mvc.perform(get("/api/auth/session").header("X-CSBET-Session", "1")
+                            .cookie(new jakarta.servlet.http.Cookie("CSBET_SESSION", token)))
+                    .andExpect(status().isUnauthorized());
+        }
+    }
+
+    @Test
+    void cookieDoesNotAuthenticatePrivateEndpointsAndSessionRequiresCustomHeader() throws Exception {
+        var cookie = new jakarta.servlet.http.Cookie("CSBET_SESSION", tokens.issue(1L).accessToken());
+        mvc.perform(get("/api/users/me").cookie(cookie)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/auth/session").cookie(cookie)).andExpect(status().isForbidden());
+        mvc.perform(post("/api/auth/logout").cookie(cookie)).andExpect(status().isForbidden());
+        mvc.perform(options("/api/auth/session").header("Origin", "https://external.example")
+                        .header("Access-Control-Request-Method", "GET")
+                        .header("Access-Control-Request-Headers", "X-CSBET-Session"))
+                .andExpect(header().doesNotExist("Access-Control-Allow-Origin"));
+    }
+
+    @Test
+    void logoutClearsPersistentCookieEvenAfterTokenExpires() throws Exception {
+        mvc.perform(post("/api/auth/logout").header("X-CSBET-Session", "1")
+                        .cookie(new jakarta.servlet.http.Cookie("CSBET_SESSION", "expired")))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Set-Cookie", allOf(containsString("Max-Age=0"),
+                        containsString("HttpOnly"), containsString("Path=/api/auth"), containsString("SameSite=Strict"))));
+    }
+
+    @Test
+    void httpsLoginUsesSecureCookie() throws Exception {
+        mvc.perform(post("/api/auth/login").secure(true).contentType("application/json").content("""
+                {"email":"player@example.com","password":"strong-password"}
+                """))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Set-Cookie", containsString("Secure")));
     }
 
     private String signed(String subject, Instant expiration, String type) {

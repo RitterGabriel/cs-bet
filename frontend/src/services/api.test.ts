@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 describe('cliente HTTP', () => {
-  it('envia login para o endpoint real e não usa cookies', async () => {
+  it('envia login com cookie de sessão e mantém o token fora do armazenamento local', async () => {
     fetchMock.mockResolvedValueOnce(
       Response.json({
         accessToken: 'test-token',
@@ -37,11 +37,36 @@ describe('cliente HTTP', () => {
       '/api/auth/login',
       expect.objectContaining({
         method: 'POST',
-        credentials: 'omit',
+        credentials: 'same-origin',
         cache: 'no-store',
         body: JSON.stringify({ email: 'p@example.com', password: 'password' }),
       }),
     );
+  });
+  it('restaura e encerra sessão com cookie e cabeçalho de proteção', async () => {
+    fetchMock.mockResolvedValueOnce(Response.json({ accessToken: 'saved-token', tokenType: 'Bearer', expiresIn: 120 }));
+    await expect(api.restoreSession()).resolves.toHaveProperty('expiresIn', 120);
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/auth/session', expect.objectContaining({
+      credentials: 'same-origin', headers: expect.objectContaining({ 'X-CSBET-Session': '1' }),
+    }));
+    fetchMock.mockResolvedValueOnce(Response.json({ message: 'Sessão encerrada.' }));
+    await api.logout();
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/auth/logout', expect.objectContaining({
+      method: 'POST', credentials: 'same-origin', headers: expect.objectContaining({ 'X-CSBET-Session': '1' }),
+    }));
+  });
+  it('ordena logout após login pendente para impedir recriação tardia do cookie', async () => {
+    let complete!: (value: Response) => void;
+    fetchMock.mockReturnValueOnce(new Promise(resolve => { complete = resolve; }));
+    fetchMock.mockResolvedValueOnce(Response.json({ message: 'Sessão encerrada.' }));
+    const login = api.login({ email: 'p@example.com', password: 'password' });
+    await Promise.resolve();
+    const logout = api.logout();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    complete(Response.json({ accessToken: 'token', tokenType: 'Bearer', expiresIn: 3600 }));
+    await login;
+    await logout;
+    expect(fetchMock.mock.calls.map(call => call[0])).toEqual(['/api/auth/login', '/api/auth/logout']);
   });
   it('envia token somente no cabeçalho Authorization', async () => {
     fetchMock.mockResolvedValueOnce(Response.json(user));

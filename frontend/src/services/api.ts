@@ -26,7 +26,7 @@ export async function request<T>(
     const response = await fetch(`${API_URL}${path}`, {
       ...options,
       signal: controller.signal,
-      credentials: 'omit',
+      credentials: options.credentials ?? 'omit',
       cache: 'no-store',
       headers: { Accept: 'application/json', ...options.headers },
     });
@@ -59,26 +59,43 @@ export async function request<T>(
   }
 }
 
+function validateSession(result: LoginResponse): LoginResponse {
+  if (
+    typeof result.accessToken !== 'string' || !result.accessToken ||
+    result.tokenType !== 'Bearer' || !Number.isFinite(result.expiresIn) || result.expiresIn <= 0
+  ) throw new ApiError(0, 'Não foi possível iniciar a sessão. Tente novamente.');
+  return result;
+}
+
+// Ordena login e logout para que uma resposta antiga não recrie o cookie após sair.
+let sessionOperation: Promise<unknown> = Promise.resolve();
+function changeSession<T>(action: () => Promise<T>): Promise<T> {
+  const next = sessionOperation.then(action, action);
+  sessionOperation = next.catch(() => {});
+  return next;
+}
+
 export const api = {
   async login(data: LoginRequest): Promise<LoginResponse> {
-    const result = await request<LoginResponse>('/auth/login', {
+    return changeSession(async () => validateSession(await request<LoginResponse>('/auth/login', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    });
-    if (
-      typeof result.accessToken !== 'string' ||
-      !result.accessToken ||
-      result.tokenType !== 'Bearer' ||
-      !Number.isFinite(result.expiresIn) ||
-      result.expiresIn <= 0
-    ) {
-      throw new ApiError(
-        0,
-        'Não foi possível iniciar a sessão. Tente novamente.',
-      );
-    }
-    return result;
+    })));
+  },
+  async restoreSession(): Promise<LoginResponse> {
+    return validateSession(await request<LoginResponse>('/auth/session', {
+      credentials: 'same-origin',
+      headers: { 'X-CSBET-Session': '1' },
+    }));
+  },
+  logout(): Promise<{ message: string }> {
+    return changeSession(() => request('/auth/logout', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSBET-Session': '1' },
+    }));
   },
   register(data: RegisterRequest) {
     return request<UserResponse>('/users', {
