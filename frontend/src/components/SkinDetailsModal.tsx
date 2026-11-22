@@ -2,6 +2,7 @@ import { useEffect, useId, useRef } from 'react';
 import { X } from 'lucide-react';
 import type { CaseItem } from '../types/catalog';
 import { CatalogImage } from './CatalogImage';
+import { marketTeamLabel } from '../services/marketCatalog';
 import { MarketPricePanel } from './MarketPricePanel';
 
 export function SkinDetailsModal({
@@ -41,7 +42,11 @@ export function SkinDetailsModal({
         <button
           className="icon-button close-button"
           onClick={onClose}
-          aria-label="Fechar detalhes da skin"
+          aria-label={
+            item.weaponType === 'agent'
+              ? 'Fechar detalhes do agente'
+              : 'Fechar detalhes da skin'
+          }
           autoFocus
         >
           <X />
@@ -52,6 +57,11 @@ export function SkinDetailsModal({
         <p className="skin-rarity" style={{ color: item.rarityData?.color }}>
           {item.rarityData?.name ?? item.rarity}
         </p>
+        {item.weaponType === 'agent' && (
+          <p className="muted">
+            Equipe: {marketTeamLabel(item.weapon ?? '')} · Sem desgaste
+          </p>
+        )}
         <MarketPricePanel quotes={item.marketPrices ?? []} name={item.name} />
       </div>
     </dialog>

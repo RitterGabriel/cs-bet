@@ -23,8 +23,10 @@ class MarketCatalogRepositoryTest {
         when(query.getResultList()).thenReturn(Collections.singletonList(new Object[]{item,new java.math.BigDecimal("10.00")}));
         when(count.getSingleResult()).thenReturn(80L);
         var now=LocalDateTime.of(2026,11,22,12,0);
-        var result=new MarketCatalogRepository(manager).skins("AK%_","AK-47","rare",Wear.FT,"price_desc",PageRequest.of(2,24),now);
+        var result=new MarketCatalogRepository(manager).skins("AK%_",MarketCategory.RIFLES,"AK-47","rare",Wear.FT,"price_desc",PageRequest.of(2,24),now);
         assertThat(result.getContent()).containsExactly(item);assertThat(result.getTotalElements()).isEqualTo(80);
+        verify(manager).createQuery(contains("s.specialCategory='none' and s.weaponType='csgo_inventory_weapon_category_rifles'"),eq(Object[].class));
+        verify(manager).createQuery(contains("s.specialCategory='none' and s.weaponType='csgo_inventory_weapon_category_rifles'"),eq(Long.class));
         verify(query).setFirstResult(48);verify(query).setMaxResults(24);verify(query).setParameter("now",now);
         for (var q:List.of(query,count)) {
             verify(q).setParameter("search","%ak!%!_%");verify(q).setParameter("weapon","AK-47");

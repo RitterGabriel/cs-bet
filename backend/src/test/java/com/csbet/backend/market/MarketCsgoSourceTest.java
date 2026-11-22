@@ -92,6 +92,17 @@ class MarketCsgoSourceTest {
         assertThat(next.amount()).isEqualByComparingTo(first.amount().multiply(new BigDecimal("2")));
     }
     @Test
+    void agentsUseExactMarketNamesWithoutInventingWearOrStatTrakVariants() throws Exception {
+        var agent=com.csbet.backend.skin.AgentCatalogSource.bundled().getFirst();
+        var matched=catalog.match(agent.marketHashName());
+        assertThat(matched).isNotNull();assertThat(matched.externalId()).isEqualTo(agent.id());
+        assertThat(matched.wear()).isEqualTo(Wear.NONE);assertThat(matched.statTrak()).isFalse();assertThat(matched.souvenir()).isFalse();
+        assertThat(catalog.match(agent.marketHashName()+" (Factory New)")).isNull();
+        assertThat(catalog.match("StatTrak™ "+agent.marketHashName())).isNull();
+        var quote=source(feed(item(agent.marketHashName(),"10")),FX,new ArrayList<>()).fetch().getFirst();
+        assertThat(quote.externalId()).isEqualTo(agent.id());assertThat(quote.currency()).isEqualTo("BRL");
+    }
+    @Test
     void everyOfficialCaseInTheSnapshotCanReceiveItsOwnQuote() throws Exception {
         try (var input = getClass().getResourceAsStream("/catalog/crates.json")) {
             var cases = mapper.readTree(input);

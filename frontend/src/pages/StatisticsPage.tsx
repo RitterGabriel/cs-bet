@@ -81,9 +81,10 @@ export function StatisticsPage() {
       <div className="info-box statistics-info">
         <ShieldCheck size={22} />
         <p>
-          Não exibimos probabilidades oficiais sem verificação. Quando esses
-          dados estiverem disponíveis, cada caixa terá suas próprias
-          informações, com origem e regras transparentes.
+          Nas caixas verificadas, a chance do grupo especial segue a publicação
+          oficial. A conversão do dourado em um item especial usa seleção
+          uniforme própria do CS Bet, com chances iguais entre as opções
+          especiais da caixa.
         </p>
       </div>
       <section className="panel personal-statistics">

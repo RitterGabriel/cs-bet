@@ -8,6 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BackendApplication {
     public static void main(String[] args) {
+        if (Arrays.asList(args).contains("--agents-import")) {
+            System.exit(com.csbet.backend.skin.AgentCatalogImportApplication.run(args));
+            return;
+        }
         if (Arrays.asList(args).contains("--catalog-import")) {
             System.exit(CatalogImportApplication.run(args));
             return;

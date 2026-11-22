@@ -10,11 +10,16 @@ final class CatalogMarketIndex {
     record Match(MarketPriceSource.Target target, String externalId, Wear wear, boolean statTrak, boolean souvenir) { }
     private final Map<String, String> skins;
     private final Map<String, String> cases;
+    private final Map<String, String> agents;
     private static final Map<String, Wear> WEARS = Map.of(
             "Factory New", Wear.FN, "Minimal Wear", Wear.MW, "Field-Tested", Wear.FT,
             "Well-Worn", Wear.WW, "Battle-Scarred", Wear.BS);
-    CatalogMarketIndex() { this(read("skins"), read("crates")); }
-    CatalogMarketIndex(JsonNode skins, JsonNode cases) { this.skins = uniqueNames(skins); this.cases = uniqueNames(cases); }
+    CatalogMarketIndex() { this(read("skins"), read("crates"), com.csbet.backend.skin.AgentCatalogSource.bundled()); }
+    CatalogMarketIndex(JsonNode skins, JsonNode cases) { this(skins,cases,List.of()); }
+    CatalogMarketIndex(JsonNode skins, JsonNode cases, List<com.csbet.backend.skin.AgentCatalogSource.Agent> agents) {
+        this.skins = uniqueNames(skins); this.cases = uniqueNames(cases);
+        this.agents = agents.stream().collect(java.util.stream.Collectors.toUnmodifiableMap(com.csbet.backend.skin.AgentCatalogSource.Agent::marketHashName,com.csbet.backend.skin.AgentCatalogSource.Agent::id));
+    }
     private static JsonNode read(String file) {
         try (var input = CatalogMarketIndex.class.getResourceAsStream("/catalog/" + file + ".json")) {
             if (input == null) throw new IllegalStateException("Snapshot do catálogo ausente.");
@@ -37,6 +42,8 @@ final class CatalogMarketIndex {
     Match match(String hash) {
         String caseId = cases.get(hash);
         if (caseId != null) return new Match(MarketPriceSource.Target.CASE, caseId, Wear.NONE, false, false);
+        String agentId = agents.get(hash);
+        if (agentId != null) return new Match(MarketPriceSource.Target.SKIN,agentId,Wear.NONE,false,false);
         String name = hash;
         Wear wear = Wear.NONE;
         for (var entry : WEARS.entrySet()) {

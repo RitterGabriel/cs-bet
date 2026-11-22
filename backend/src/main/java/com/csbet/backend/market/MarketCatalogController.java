@@ -10,8 +10,8 @@ public class MarketCatalogController {
     @GetMapping
     public MarketCatalogDtos.SkinPage list(@RequestParam(defaultValue="0") int page, @RequestParam(defaultValue="24") int size,
             @RequestParam(defaultValue="") String search, @RequestParam(defaultValue="") String weapon,
-            @RequestParam(defaultValue="") String rarity, @RequestParam(defaultValue="") String wear,
-            @RequestParam(defaultValue="name") String sort) {
-        return service.list(page,size,search,weapon,rarity,wear,sort);
+            @RequestParam(defaultValue="") String category, @RequestParam(defaultValue="") String rarity, @RequestParam(defaultValue="") String wear,
+            @RequestParam(defaultValue="name") String sort, @RequestParam(defaultValue="all") String kind) {
+        return service.list(page,size,search,category,weapon,rarity,wear,sort,kind);
     }
 }

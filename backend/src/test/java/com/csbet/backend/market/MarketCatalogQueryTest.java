@@ -17,8 +17,14 @@ class MarketCatalogQueryTest {
             try (var factory=sources.buildMetadata().buildSessionFactory(); var session=factory.openSession()) {
                 for (var sort : new String[]{"name","name_desc","price_asc","price_desc"}) {
                     for (var weapon : new boolean[]{false,true}) for (var rarity : new boolean[]{false,true}) for (var wear : new boolean[]{false,true}) {
-                        session.createQuery(MarketCatalogRepository.skinQuery(sort,weapon,rarity,wear),Object[].class);
-                        session.createQuery("select count(s)"+MarketCatalogRepository.skinWhere(weapon,rarity,wear).replace("join fetch","join"),Long.class);
+                        var categories = new java.util.ArrayList<MarketCategory>(java.util.Arrays.asList(MarketCategory.values()));
+                        categories.add(null);
+                        for (var category : categories) {
+                            for (var kind : MarketItemKind.values()) {
+                                session.createQuery(MarketCatalogRepository.skinQuery(sort,weapon,rarity,wear,category,kind),Object[].class);
+                                session.createQuery("select count(s)"+MarketCatalogRepository.skinWhere(weapon,rarity,wear,category,kind).replace("join fetch","join"),Long.class);
+                            }
+                        }
                     }
                 }
                 session.createQuery(MarketCatalogRepository.caseQuery("price_asc"),WeaponCase.class);

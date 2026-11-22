@@ -1,0 +1,10 @@
+{
+  "source": "https://github.com/ByMykel/CSGO-API",
+  "revision": "a9657126c997f5182306c5b78a01e92eb4153a08",
+  "language": "en",
+  "upstream": "https://raw.githubusercontent.com/ByMykel/CSGO-API/a9657126c997f5182306c5b78a01e92eb4153a08/public/api/en/agents.json",
+  "upstreamSha256": "d7e5ccd83c0de1eb5818676f080617d7657f7644a0c0d389db275e6cab71d806",
+  "bundledSha256": "14ceae82cba1067ebba1825193d69ea30d91b83d9c84a8b6443136b53be5ab38",
+  "items": 63,
+  "license": "MIT data/project only; Valve images referenced by URL, not redistributed"
+}

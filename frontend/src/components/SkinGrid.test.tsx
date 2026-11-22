@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { SkinCard, SkinGrid } from './SkinGrid';
 import { SkinDetailsModal } from './SkinDetailsModal';
 import type { CaseItem } from '../types/catalog';
+import { OFFICIAL_ODDS_SOURCE } from '../services/officialOdds';
 import { unavailableQuote } from '../services/market';
 
 const item: CaseItem = {
@@ -36,6 +37,55 @@ describe('cards compactos e detalhes de skins', () => {
     expect(html).toContain('Ver detalhes de AK-47 | Fixture');
     expect(html).not.toContain('<select');
     expect(html).not.toContain('Histórico');
+  });
+  it('exibe chances no canto apenas no contexto da caixa, sem atribuir a chance do grupo a itens especiais', () => {
+    const withChance = {
+      ...item,
+      dropChance: {
+        percent: '1.06564365',
+        basis: 'OFFICIAL_RULES_CALCULATED' as const,
+        scope: 'SKIN_ALL_VARIANTS' as const,
+        sourceUrl: OFFICIAL_ODDS_SOURCE,
+      },
+    };
+    const box = renderToStaticMarkup(
+      <SkinCard item={withChance} showDropChance onOpen={() => {}} />,
+    );
+    expect(box).toContain('skin-drop-chance');
+    expect(box).toContain('≈ 1,0656%');
+    expect(box).toContain('agrega desgaste e StatTrak');
+    const market = renderToStaticMarkup(
+      <SkinCard item={withChance} onOpen={() => {}} />,
+    );
+    expect(market).not.toContain('skin-drop-chance');
+    const special = renderToStaticMarkup(
+      <SkinCard
+        item={{ ...item, specialCategory: 'knife', dropChance: null }}
+        showDropChance
+        onOpen={() => {}}
+      />,
+    );
+    expect(special).toContain('Chance n/d');
+    expect(special).not.toContain('0,256%');
+  });
+  it('exibe a chance agregada de uma luva ou faca quando o backend verifica o conjunto completo', () => {
+    for (const specialCategory of ['knife', 'glove'] as const) {
+      const verified = {
+        ...item,
+        specialCategory,
+        dropChance: {
+          percent: '0.01065644',
+          basis: 'OFFICIAL_RULES_CALCULATED' as const,
+          scope: 'SKIN_ALL_VARIANTS' as const,
+          sourceUrl: OFFICIAL_ODDS_SOURCE,
+        },
+      };
+      const html = renderToStaticMarkup(
+        <SkinCard item={verified} showDropChance onOpen={() => {}} />,
+      );
+      expect(html).toContain('≈ 0,0107%');
+      expect(html).not.toContain('Chance n/d');
+    }
   });
   it('unifica raridades e remove duplicações pelo ID', () => {
     const html = renderToStaticMarkup(

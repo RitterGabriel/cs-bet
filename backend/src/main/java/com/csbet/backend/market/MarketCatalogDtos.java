@@ -7,7 +7,9 @@ public final class MarketCatalogDtos {
     private MarketCatalogDtos() { }
     public record Skin(String id, String name, String weapon, String weaponType, String specialCategory,
                        String imageUrl, RarityResponse rarity, boolean special, List<MarketDtos.QuoteView> marketPrices) { }
+    public record CategoryFilter(String id, String name, List<String> weapons) { }
+    public record WeaponOption(String name, String weaponType, String specialCategory) { }
     public record RarityFilter(String id, String name, String color) { }
     public record SkinPage(List<Skin> content, int page, int size, long totalElements, int totalPages,
-                           List<String> weapons, List<RarityFilter> rarities) { }
+                           List<String> weapons, List<RarityFilter> rarities, List<CategoryFilter> categories) { }
 }

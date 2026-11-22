@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CaseController.class)
 @Import({SecurityConfig.class, JwtConfig.class, PasswordConfig.class, CaseCatalogService.class,
-        CatalogExceptionHandler.class, ApiExceptionHandler.class})
+        CatalogExceptionHandler.class, ApiExceptionHandler.class, OfficialCaseOdds.class})
 class CaseControllerTest {
     @Autowired MockMvc mvc;
     @MockitoBean com.csbet.backend.market.MarketCatalogRepository marketCatalog;
@@ -104,6 +104,30 @@ class CaseControllerTest {
                 .andExpect(jsonPath("$.box.passwordHash").doesNotExist());
         verify(contents).findContents(1L);
         verify(prices).currentForIds(List.of(2L, 3L));
+    }
+    @Test
+    void caseDetailsExposeOneOfficialSpecialGroupAndOwnSimulationRule() throws Exception {
+        var catalog = new CatalogSourceLoader().bundled();
+        var source = catalog.cases().stream().filter(c->c.id().equals("crate-7007")).findFirst().orElseThrow();
+        var box = new WeaponCase("BYMYKEL",source.id()); box.update(source.name(),null,null,catalog.revision(),catalog.language(),source.specialNotice());
+        ReflectionTestUtils.setField(box,"id",1L);
+        var byId = catalog.items().stream().collect(java.util.stream.Collectors.toMap(SourceCatalog.SourceItem::id,item->item));
+        List<CaseItem> links = new ArrayList<>();
+        for (var ref:source.links()) {
+            var data=byId.get(ref.itemId()); var skin=new CosmeticItem("BYMYKEL",data.id());
+            skin.update(data.name(),data.weapon(),data.weaponType(),data.specialCategory(),data.imageUrl(),new Rarity(data.rarity().id(),data.rarity().name(),data.rarity().color()));
+            ReflectionTestUtils.setField(skin,"id",(long)links.size()+1); links.add(new CaseItem(box,skin,ref.special()));
+        }
+        when(cases.findBySourceAndExternalId("BYMYKEL",source.id())).thenReturn(Optional.of(box));
+        when(contents.findContents(1L)).thenReturn(links);
+        mvc.perform(get("/api/cases/crate-7007")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.specialReward.configured").value(true))
+                .andExpect(jsonPath("$.specialReward.dropChance.percent").value("0.25575448"))
+                .andExpect(jsonPath("$.specialReward.dropChance.scope").value("SPECIAL_GROUP"))
+                .andExpect(jsonPath("$.specialReward.selectionRule").value("CSBET_UNIFORM_CATALOG_ITEM"))
+                .andExpect(jsonPath("$.specialItems.length()").value(52))
+                .andExpect(jsonPath("$.specialItems[0].dropChance").isEmpty());
+        mvc.perform(post("/api/cases/crate-7007/open")).andExpect(status().isUnauthorized());
     }
     @Test
     void invalidFiltersAndPaginationReturn400() throws Exception {

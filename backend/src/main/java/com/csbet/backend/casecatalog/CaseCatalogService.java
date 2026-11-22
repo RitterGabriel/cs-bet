@@ -12,12 +12,14 @@ import static com.csbet.backend.casecatalog.CatalogDtos.*;
 public class CaseCatalogService {
     private final com.csbet.backend.market.MarketCatalogRepository marketCatalog;
     private final java.time.Clock clock;
+    private final OfficialCaseOdds odds;
     private final WeaponCaseRepository cases;
     private final CaseItemRepository contents;
     private final com.csbet.backend.pricing.PriceQueryService prices;
     private final com.csbet.backend.market.MarketQueryService market;
     public CaseCatalogService(WeaponCaseRepository cases, CaseItemRepository contents, com.csbet.backend.pricing.PriceQueryService prices,
-            com.csbet.backend.market.MarketQueryService market, com.csbet.backend.market.MarketCatalogRepository marketCatalog, java.time.Clock pricingClock) {
+            com.csbet.backend.market.MarketQueryService market, com.csbet.backend.market.MarketCatalogRepository marketCatalog, java.time.Clock pricingClock, OfficialCaseOdds odds) {
+        this.odds = odds;
         this.marketCatalog = marketCatalog; this.clock = pricingClock;
         this.cases = cases; this.contents = contents; this.prices = prices; this.market = market;
     }
@@ -45,16 +47,20 @@ public class CaseCatalogService {
         var box = cases.findBySourceAndExternalId(CatalogImportService.SOURCE, externalId)
                 .orElseThrow(CatalogNotFoundException::new);
         var links = contents.findContents(box.getId());
+        var chances = odds.forCase(box, links);
+        var specialChance = odds.specialGroupForCase(box,links);
+        var specialReward = links.stream().anyMatch(CaseItem::isSpecial)
+                ? new SpecialRewardGroup(specialChance,SpecialRewardGroup.UNIFORM_RULE,specialChance != null) : null;
         var current = prices.currentForIds(links.stream().map(link -> link.getItem().getId()).distinct().toList());
         var quotes = market.skinQuotes(links.stream().map(link -> link.getItem().getId()).distinct().toList());
         var boxQuote = market.caseQuotes(java.util.List.of(box.getId())).getOrDefault(box.getId(), com.csbet.backend.market.MarketDtos.QuoteView.unavailable());
         java.util.function.Function<CaseItem, ItemResponse> response = link -> ItemResponse.from(link,
-                current.get(link.getItem().getId()), quotes.getOrDefault(link.getItem().getId(), java.util.List.of()));
+                current.get(link.getItem().getId()), quotes.getOrDefault(link.getItem().getId(), java.util.List.of()), link.isSpecial() ? null : chances.get(link.getItem().getExternalId()), SpecialItemMetadata.phase(box,link));
         return new CaseDetail(CaseSummary.from(box, priceRanges(java.util.List.of(box.getId())).get(box.getId()), boxQuote),
                 links.stream().filter(link -> !link.isSpecial()).map(response).toList(),
                 links.stream().filter(CaseItem::isSpecial).map(response).toList(),
                 box.getSpecialNotice(), "https://github.com/ByMykel/CSGO-API", box.getSourceRevision(), box.getImportedAt(),
-                "URLs da fonte. Artes pertencem à Valve; a licença MIT dos dados não concede licença sobre essas imagens.");
+                "URLs da fonte. Artes pertencem à Valve; a licença MIT dos dados não concede licença sobre essas imagens.",specialReward);
     }
     private java.util.Map<Long, com.csbet.backend.pricing.PriceDtos.ItemPriceRange> priceRanges(java.util.List<Long> ids) {
         if (ids.isEmpty()) return java.util.Map.of();

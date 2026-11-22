@@ -1,3 +1,7 @@
+import type {
+  OfficialDropChance,
+  SpecialReward,
+} from '../services/officialOdds';
 import type { MarketQuote } from '../services/market';
 import type { SimulatedPrice, PriceRange } from '../services/pricing';
 
@@ -17,6 +21,8 @@ export interface CaseItem {
   rarity: Rarity;
   simulatedPrice?: SimulatedPrice | null;
   marketPrices?: MarketQuote[];
+  dropChance?: OfficialDropChance | null;
+  phase?: string | null;
   rarityData?: { id: string; name: string; color: string };
   weapon?: string;
   weaponType?: string;
@@ -34,6 +40,7 @@ export interface CatalogCase {
   // Cada caixa possui seus próprios itens e seu próprio grupo especial.
   items: CaseItem[];
   specialItems: CaseItem[];
+  specialReward?: SpecialReward | null;
   specialKind?: 'knives' | 'gloves';
   isReal?: boolean;
   simulatedItemPrices?: PriceRange | null;

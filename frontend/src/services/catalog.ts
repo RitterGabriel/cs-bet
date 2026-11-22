@@ -1,3 +1,5 @@
+import { verifiedDropChance, verifiedSpecialReward } from './officialOdds';
+import type { OfficialDropChance, SpecialReward } from './officialOdds';
 import { validateMarketQuote } from './market';
 import type { MarketQuote } from './market';
 import { ApiError, request } from './api';
@@ -28,11 +30,14 @@ export interface OfficialItem {
   special: boolean;
   simulatedPrice?: SimulatedPrice | null;
   marketPrices?: MarketQuote[];
+  dropChance?: OfficialDropChance | null;
+  phase?: string | null;
 }
 interface OfficialCaseDetail {
   box: OfficialCaseSummary;
   items: OfficialItem[];
   specialItems: OfficialItem[];
+  specialReward?: SpecialReward | null;
   source: string;
   sourceRevision: string;
   specialNotice: string;
@@ -52,6 +57,10 @@ const rarityKeys: Record<string, Rarity> = {
   rarity_ancient_weapon: 'covert',
   rarity_ancient: 'special',
   rarity_uncommon_weapon: 'industrial',
+  rarity_rare_character: 'mil-spec',
+  rarity_mythical_character: 'restricted',
+  rarity_legendary_character: 'classified',
+  rarity_ancient_character: 'covert',
 };
 export function mapOfficialCase(box: OfficialCaseSummary): CatalogCase {
   if (
@@ -111,6 +120,8 @@ export function mapItem(item: OfficialItem): CaseItem {
     specialCategory: item.specialCategory,
     simulatedPrice: validatePrice(item.simulatedPrice),
     marketPrices: (item.marketPrices ?? []).map(validateMarketQuote),
+    dropChance: verifiedDropChance(item.dropChance),
+    phase: typeof item.phase === 'string' ? item.phase : null,
   };
 }
 export async function listOfficialCases(
@@ -161,6 +172,7 @@ export async function getOfficialCase(id: string): Promise<CatalogCase> {
     ...mapOfficialCase(result.box),
     items: result.items.map(mapItem),
     specialItems: result.specialItems.map(mapItem),
+    specialReward: verifiedSpecialReward(result.specialReward),
     source: result.source,
     sourceRevision: result.sourceRevision,
     specialNotice: result.specialNotice,

@@ -18,11 +18,25 @@ public class MarketCatalogRepository {
                 + (wear ? " and v.wear=:wear" : "") + ")";
     }
     public static String skinWhere(boolean weapon, boolean rarity, boolean wear) {
+        return skinWhere(weapon, rarity, wear, null);
+    }
+    public static String skinWhere(boolean weapon, boolean rarity, boolean wear, MarketCategory category) {
+        return skinWhere(weapon,rarity,wear,category,MarketItemKind.SKINS);
+    }
+    public static String skinWhere(boolean weapon, boolean rarity, boolean wear, MarketCategory category, MarketItemKind kind) {
         return " from CosmeticItem s join fetch s.rarity r where s.source='BYMYKEL' and lower(s.name) like :search escape '!'"
+                + " and " + kind.predicate()
+                + (category != null ? " and (" + category.predicate() + ")" : "")
                 + (weapon ? " and s.weapon=:weapon" : "") + (rarity ? " and r.id=:rarity" : "")
                 + (wear ? " and exists(select w.id from MarketVariant w where w.skinId=s.id and w.wear=:wear)" : "");
     }
     public static String skinQuery(String sort, boolean weapon, boolean rarity, boolean wear) {
+        return skinQuery(sort, weapon, rarity, wear, null);
+    }
+    public static String skinQuery(String sort, boolean weapon, boolean rarity, boolean wear, MarketCategory category) {
+        return skinQuery(sort,weapon,rarity,wear,category,MarketItemKind.SKINS);
+    }
+    public static String skinQuery(String sort, boolean weapon, boolean rarity, boolean wear, MarketCategory category, MarketItemKind kind) {
         String minimum = skinMinimum(wear);
         String order = switch (sort) {
             case "name" -> "s.name asc, s.externalId asc";
@@ -31,12 +45,15 @@ public class MarketCatalogRepository {
                     + (sort.equals("price_asc") ? "asc" : "desc") + ", s.name asc, s.externalId asc";
             default -> throw new IllegalArgumentException("Ordenação inválida.");
         };
-        return "select s, " + minimum + " as minimumPrice" + skinWhere(weapon, rarity, wear) + " order by " + order;
+        return "select s, " + minimum + " as minimumPrice" + skinWhere(weapon, rarity, wear, category,kind) + " order by " + order;
     }
-    public Page<CosmeticItem> skins(String search, String weapon, String rarity, Wear wear, String sort, Pageable page, LocalDateTime now) {
+    public Page<CosmeticItem> skins(String search, MarketCategory category, String weapon, String rarity, Wear wear, String sort, Pageable page, LocalDateTime now) {
+        return skins(search,category,weapon,rarity,wear,sort,page,now,MarketItemKind.SKINS);
+    }
+    public Page<CosmeticItem> skins(String search, MarketCategory category, String weapon, String rarity, Wear wear, String sort, Pageable page, LocalDateTime now, MarketItemKind kind) {
         boolean hasWeapon = !weapon.isEmpty(), hasRarity = !rarity.isEmpty(), hasWear = wear != null;
-        var query = entityManager.createQuery(skinQuery(sort, hasWeapon, hasRarity, hasWear), Object[].class);
-        var count = entityManager.createQuery("select count(s)" + skinWhere(hasWeapon, hasRarity, hasWear).replace("join fetch", "join"), Long.class);
+        var query = entityManager.createQuery(skinQuery(sort, hasWeapon, hasRarity, hasWear, category,kind), Object[].class);
+        var count = entityManager.createQuery("select count(s)" + skinWhere(hasWeapon, hasRarity, hasWear, category,kind).replace("join fetch", "join"), Long.class);
         for (var q : List.of(query, count)) {
             q.setParameter("search", escapedSearch(search));
             if (hasWeapon) q.setParameter("weapon", weapon);
@@ -46,11 +63,14 @@ public class MarketCatalogRepository {
         query.setParameter("now", now).setFirstResult(Math.toIntExact(page.getOffset())).setMaxResults(page.getPageSize());
         return new PageImpl<>(query.getResultList().stream().map(row -> (CosmeticItem) row[0]).toList(), page, count.getSingleResult());
     }
-    public List<String> weapons() {
-        return entityManager.createQuery("select distinct s.weapon from CosmeticItem s where s.source='BYMYKEL' order by s.weapon", String.class).getResultList();
+    public List<MarketCatalogDtos.WeaponOption> weaponOptions() { return weaponOptions(MarketItemKind.SKINS); }
+    public List<MarketCatalogDtos.WeaponOption> weaponOptions(MarketItemKind kind) {
+        return entityManager.createQuery("select distinct s.weapon,s.weaponType,s.specialCategory from CosmeticItem s where s.source='BYMYKEL' and " + kind.predicate() + " order by s.weapon", Object[].class)
+                .getResultList().stream().map(row -> new MarketCatalogDtos.WeaponOption((String)row[0], (String)row[1], (String)row[2])).toList();
     }
-    public List<MarketCatalogDtos.RarityFilter> rarities() {
-        return entityManager.createQuery("select distinct r.id,r.name,r.color from CosmeticItem s join s.rarity r where s.source='BYMYKEL' order by r.name", Object[].class)
+    public List<MarketCatalogDtos.RarityFilter> rarities() { return rarities(MarketItemKind.SKINS); }
+    public List<MarketCatalogDtos.RarityFilter> rarities(MarketItemKind kind) {
+        return entityManager.createQuery("select distinct r.id,r.name,r.color from CosmeticItem s join s.rarity r where s.source='BYMYKEL' and " + kind.predicate() + " order by r.name", Object[].class)
                 .getResultList().stream().map(row -> new MarketCatalogDtos.RarityFilter((String)row[0],(String)row[1],(String)row[2])).toList();
     }
     public static String caseQuery(String sort) {

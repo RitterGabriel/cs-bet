@@ -9,6 +9,8 @@ import { ApiError } from "../services/api";
 import { CatalogImage } from "../components/CatalogImage";
 import { MarketPriceNotice } from "../components/MarketPriceNotice";
 import { MarketPricePanel } from "../components/MarketPricePanel";
+import { OFFICIAL_ODDS_SOURCE } from "../services/officialOdds";
+import { GoldSpecialCard } from "../components/GoldSpecialCard";
 import { SkinGrid } from "../components/SkinGrid";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -83,11 +85,9 @@ export function CaseDetailsPage() {
   );
 }
 
-function CaseDetailsContent({ item }: { item: CatalogCase }) {
+export function CaseDetailsContent({ item }: { item: CatalogCase }) {
   const skins = [
-    ...new Map(
-      [...item.items, ...item.specialItems].map((entry) => [entry.id, entry]),
-    ).values(),
+    ...new Map(item.items.map((entry) => [entry.id, entry])).values(),
   ];
   return (
     <div className="container page-content">
@@ -160,11 +160,32 @@ function CaseDetailsContent({ item }: { item: CatalogCase }) {
           <Box size={21} />
           <h2 id="contents-title">Conteúdo da caixa</h2>
           <span className="mini-tag">
-            {skins.length ? `${skins.length} itens na fonte` : "Em preparação"}
+            {skins.length || item.specialItems.length
+              ? `${skins.length} skins${item.specialItems.length ? " + 1 item especial" : ""}`
+              : "Em preparação"}
           </span>
         </div>
-        {skins.length ? (
-          <SkinGrid items={skins} />
+        {item.isReal && (
+          <p className="case-odds-note">
+            Chances aproximadas calculadas pelas{" "}
+            <a href={OFFICIAL_ODDS_SOURCE} target="_blank" rel="noreferrer">
+              regras oficiais da Perfect World
+            </a>
+            , sem separar desgaste ou StatTrak. O dourado representa o grupo
+            especial. Ao recebê-lo, uma seleção interna uniforme escolhe um dos
+            itens especiais cadastrados na caixa — regra da simulação CS Bet.
+          </p>
+        )}
+        {skins.length || item.specialItems.length ? (
+          <SkinGrid
+            items={skins}
+            showDropChance={item.isReal}
+            specialReward={
+              item.specialItems.length > 0 ? (
+                <GoldSpecialCard reward={item.specialReward} items={item.specialItems} caseName={item.name} />
+              ) : undefined
+            }
+          />
         ) : (
           <div className="empty-state compact">
             <Box size={35} />
@@ -177,9 +198,6 @@ function CaseDetailsContent({ item }: { item: CatalogCase }) {
           </div>
         )}
       </section>
-      {item.specialNotice && (
-        <p className="catalog-footnote">{item.specialNotice}</p>
-      )}
       <section className="panel">
         <div className="panel-title">
           <Layers3 size={21} />
@@ -187,8 +205,9 @@ function CaseDetailsContent({ item }: { item: CatalogCase }) {
         </div>
         <p className="muted">
           As cores identificam as categorias informadas pela fonte. A borda e a
-          etiqueta de cada item preservam sua raridade original. Não atribuímos
-          percentuais por item ou por raridade sem uma fonte verificável.
+          etiqueta de cada item preservam sua raridade original. As chances
+          exibidas são aproximações calculadas conforme a fonte oficial, não
+          garantias de resultado.
         </p>
         <Link className="text-link" to="/statistics">
           Conheça os conceitos estatísticos
