@@ -15,6 +15,7 @@ import type { CatalogPageResponse } from '../services/catalog';
 import { ApiError } from '../services/api';
 import { MarketPriceNotice } from '../components/MarketPriceNotice';
 import { CaseCard } from '../components/CaseCard';
+import { CatalogHeroShowcase } from '../components/CatalogHeroShowcase';
 import { cases } from '../data/cases';
 import type { CaseCategory } from '../types/catalog';
 
@@ -132,26 +133,11 @@ export function CatalogPage({
               </span>
             </div>
           </div>
-          <div className="hero-visual" aria-hidden="true">
-            <div className="orbit orbit-one" />
-            <div className="orbit orbit-two" />
-            <span className="visual-cross cross-one">+</span>
-            <span className="visual-cross cross-two">+</span>
-            <div className="hero-visual-label">
-              <Crosshair size={15} />{' '}
-              {custom ? 'CURADORIA CS BET' : 'EXPLORE O UNIVERSO CS2'}
-            </div>
-            <img
-              src={custom ? '/images/neon.svg' : '/images/revolution.svg'}
-              alt=""
-              width="640"
-              height="420"
-            />
-            <div className="hero-image-caption">
-              <span>{custom ? 'Coleção Neon' : 'Revolution Case'}</span>
-              <small>ILUSTRAÇÃO DEMONSTRATIVA</small>
-            </div>
-          </div>
+          <CatalogHeroShowcase
+            items={!custom && (loading || error) ? [] : visibleCases}
+            custom={custom}
+            loading={!custom && loading}
+          />
         </div>
       </section>
       <section

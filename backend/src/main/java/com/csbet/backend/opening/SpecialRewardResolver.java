@@ -33,13 +33,24 @@ public class SpecialRewardResolver {
     public ResolvedSpecialItem resolveSpecialWin(String caseId) {
         var box = cases.findBySourceAndExternalId("BYMYKEL",caseId).orElseThrow(CatalogNotFoundException::new);
         var links = contents.findContents(box.getId());
+        return prepare(box, links).resolve();
+    }
+
+    /** Valida uma única vez o conjunto carregado pelo motor, sem consultas por amostra. */
+    public PreparedSpecialPool prepare(WeaponCase box, List<CaseItem> links) {
         if (odds.specialGroupForCase(box,links) == null) throw new IllegalStateException("Grupo especial não configurado ou incompleto.");
         var pool = links.stream().filter(CaseItem::isSpecial)
                 .map(CaseItem::getItem).sorted(Comparator.comparing(com.csbet.backend.skin.CosmeticItem::getExternalId)).toList();
         if (pool.isEmpty() || pool.stream().anyMatch(item -> item.getId() == null)
                 || pool.stream().map(com.csbet.backend.skin.CosmeticItem::getId).distinct().count() != pool.size())
             throw new IllegalStateException("Conjunto especial inconsistente.");
-        var selected = pool.get(random.nextInt(pool.size()));
-        return new ResolvedSpecialItem(selected.getId(),selected.getExternalId());
+        return new PreparedSpecialPool(pool.stream()
+                .map(item -> new ResolvedSpecialItem(item.getId(), item.getExternalId())).toList());
+    }
+
+    public final class PreparedSpecialPool {
+        private final List<ResolvedSpecialItem> items;
+        private PreparedSpecialPool(List<ResolvedSpecialItem> items) { this.items = List.copyOf(items); }
+        public ResolvedSpecialItem resolve() { return items.get(random.nextInt(items.size())); }
     }
 }

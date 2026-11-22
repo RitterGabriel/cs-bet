@@ -15,13 +15,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class OfficialCaseOdds {
+    public static final String SPECIAL_GROUP = "SPECIAL_GROUP";
+    private static final int SPECIAL_WEIGHT = 2;
     public static final String SOURCE = "https://www.csgo.com.cn/news/gamebroad/20170911/206155.shtml";
     private static final Map<String,Integer> WEIGHTS = Map.of(
             "rarity_rare_weapon",625, "rarity_mythical_weapon",125,
             "rarity_legendary_weapon",25, "rarity_ancient_weapon",5);
+    private static final int TOTAL_WEIGHT = WEIGHTS.values().stream().mapToInt(Integer::intValue).sum() + SPECIAL_WEIGHT;
     private final Map<String,Map<String,String>> verifiedCases;
     private final Map<String,Map<String,String>> catalogSpecialItems;
     private final String revision;
+
+    public record RarityWeight(String rarityId, int weight, Chance chance) { }
 
     public record Chance(@JsonFormat(shape=JsonFormat.Shape.STRING) BigDecimal percent,
                          String basis, String scope, String sourceUrl) { }
@@ -47,6 +52,20 @@ public class OfficialCaseOdds {
         }
         catalogSpecialItems = Map.copyOf(specialItems);
     }
+    /** Pesos inteiros para sorteio, somente com o catálogo completo e verificado. */
+    public List<RarityWeight> distributionForCase(WeaponCase box, List<CaseItem> links) {
+        var special = specialGroupForCase(box, links);
+        if (special == null) return List.of();
+        List<RarityWeight> result = new ArrayList<>();
+        WEIGHTS.entrySet().stream().sorted(Map.Entry.<String,Integer>comparingByValue().reversed())
+                .forEach(entry -> result.add(new RarityWeight(entry.getKey(), entry.getValue(),
+                        new Chance(BigDecimal.valueOf(entry.getValue() * 100L)
+                                .divide(BigDecimal.valueOf(TOTAL_WEIGHT), 8, RoundingMode.HALF_UP),
+                                "OFFICIAL_RULES_CALCULATED", "RARITY_ALL_VARIANTS", SOURCE))));
+        result.add(new RarityWeight(SPECIAL_GROUP, SPECIAL_WEIGHT, special));
+        return List.copyOf(result);
+    }
+
     /** Chance oficial do grupo, sem supor uma distribuição oficial entre suas opções. */
     public Chance specialGroupForCase(WeaponCase box, List<CaseItem> links) {
         if (forCase(box,links).isEmpty()) return null;
@@ -57,7 +76,7 @@ public class OfficialCaseOdds {
             if (link.isSpecial() && actual.put(link.getItem().getExternalId(),link.getItem().getRarity().getId()) != null) return null;
         }
         if (!expected.equals(actual)) return null;
-        return new Chance(BigDecimal.valueOf(200).divide(BigDecimal.valueOf(782),8,RoundingMode.HALF_UP),
+        return new Chance(BigDecimal.valueOf(SPECIAL_WEIGHT * 100L).divide(BigDecimal.valueOf(TOTAL_WEIGHT),8,RoundingMode.HALF_UP),
                 "OFFICIAL_RULES_CALCULATED","SPECIAL_GROUP",SOURCE);
     }
     public Map<String,Chance> forCase(WeaponCase box, List<CaseItem> links) {
@@ -75,7 +94,7 @@ public class OfficialCaseOdds {
         Map<String,Chance> result = new HashMap<>();
         actual.forEach((id,rarity) -> {
             BigDecimal percent = BigDecimal.valueOf(WEIGHTS.get(rarity) * 100L)
-                    .divide(BigDecimal.valueOf(782L * counts.get(rarity)),8,RoundingMode.HALF_UP);
+                    .divide(BigDecimal.valueOf((long) TOTAL_WEIGHT * counts.get(rarity)),8,RoundingMode.HALF_UP);
             result.put(id,new Chance(percent,"OFFICIAL_RULES_CALCULATED","SKIN_ALL_VARIANTS",SOURCE));
         });
         return Map.copyOf(result);

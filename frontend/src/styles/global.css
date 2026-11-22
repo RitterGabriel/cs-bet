@@ -2929,3 +2929,26 @@ main {
   .wallet-preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .wallet-section-heading { align-items: flex-start; }
 }
+
+/* A arte oficial mantém sua proporção e não herda a escala da ilustração. */
+.hero-official-art > img {
+  width: min(82%, 340px);
+  max-width: 100%;
+  height: 260px;
+  object-fit: contain;
+  transform: none;
+}
+@media (max-width: 620px) {
+  .hero-official-art > img {
+    width: min(78%, 280px);
+    height: 190px;
+    transform: translateY(-12px);
+  }
+}
+
+.hero-showcase-empty { color: var(--muted); font-size: .8rem; text-align: center; padding: 32px; z-index: 1; }
+.hero-custom .hero-showcase > img { width: min(85%, 340px); max-width: 100%; height: 240px; object-fit: contain; transform: none; }
+@media (max-width: 620px) {
+  .hero-showcase { height: 300px; }
+  .hero-custom .hero-showcase > img { height: 190px; transform: translateY(-12px); }
+}
