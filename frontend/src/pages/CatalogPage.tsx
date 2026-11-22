@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import {
+  ArrowUpRight,
   Box,
+  ChevronDown,
+  Info,
   Check,
   Crosshair,
   Layers3,
@@ -83,42 +86,42 @@ export function CatalogPage({
         : result;
   }, [category, custom, query, sort, remote]);
   return (
-    <>
+    <div className="catalog-experience">
       <section className={`hero ${custom ? 'hero-custom' : ''}`}>
         <div className="container hero-inner">
           <div className="hero-copy">
             <span className="pill">
               <span className="pill-marker" />{' '}
               {custom
-                ? 'COLEÇÕES COM IDENTIDADE'
-                : 'BEM-VINDO AO UNIVERSO CS BET'}
+                ? 'CRIATIVIDADE EM CADA DETALHE'
+                : 'O SEU UNIVERSO CS2'}
             </span>
             <h1>
               {custom ? (
                 <>
-                  Novas ideias.
+                  SEU ESTILO.
                   <br />
-                  <em>Outras possibilidades.</em>
+                  <em>OUTRAS POSSIBILIDADES.</em>
                 </>
               ) : (
                 <>
-                  Cada caixa,
+                  EXPLORE O
                   <br />
-                  um universo <em>para explorar.</em>
+                  <em>UNIVERSO CS2.</em>
                 </>
               )}
             </h1>
             <p>
               {custom
-                ? 'Explore coleções temáticas criadas para o CS Bet. Uma curadoria fictícia, com espaço para a criatividade.'
-                : 'Descubra caixas icônicas e coleções únicas do CS2. Explore o catálogo e conheça os conceitos por trás de cada item.'}
+                ? 'Coleções temáticas com a identidade CS Bet. Novas combinações para conhecer e imaginar.'
+                : 'Caixas icônicas e skins marcantes. Descubra os detalhes que tornam cada coleção única.'}
             </p>
             <div className="hero-actions">
               <a className="button primary" href="#catalog">
-                <Box size={18} /> Explorar {custom ? 'coleções' : 'catálogo'}
+                Explorar {custom ? 'coleções' : 'caixas'} <ArrowUpRight size={18} />
               </a>
               <Link className="text-link" to="/statistics">
-                <BarChartIcon /> Minhas estatísticas
+                <BarChartIcon /> Meu histórico
               </Link>
             </div>
             <div className="hero-notes">
@@ -149,35 +152,32 @@ export function CatalogPage({
           <div>
             <span className="eyebrow">
               {custom
-                ? 'CRIADAS PARA EXPLORAR'
-                : 'SEU PRÓXIMO PONTO DE PARTIDA'}
+                ? 'FEITAS DE CRIATIVIDADE'
+                : 'ESCOLHA. CONHEÇA. EXPLORE.'}
             </span>
             <h2 id="catalog-title">
               {custom ? 'Coleções personalizadas' : 'Caixas oficiais'}{' '}
               <span className="count-tag">
                 {custom
                   ? cases.filter((item) => item.category === 'custom').length
-                  : remote.totalElements}
+                  : loading ? '—' : remote.totalElements}
               </span>
             </h2>
             <p>
               {custom
                 ? 'Criações fictícias do CS Bet, inspiradas em temas e estilos.'
-                : 'Caixas oficiais de armas do Counter-Strike 2, conforme a fonte pública.'}
+                : 'Encontre suas favoritas e conheça os itens de cada coleção.'}
             </p>
           </div>
           <span className="section-label">
             <span className="tiny-diamond" />{' '}
-            {custom ? 'CATÁLOGO DEMONSTRATIVO' : 'DADOS PÚBLICOS · BYMYKEL'}
+            {custom ? 'CATÁLOGO DEMONSTRATIVO' : 'CATÁLOGO COUNTER-STRIKE 2'}
           </span>
         </div>
-        {!custom && (
-          <MarketPriceNotice
-            quotes={remote.content.flatMap((item) =>
-              item.marketPrice ? [item.marketPrice] : [],
-            )}
-          />
-        )}
+        {!custom && <details className="catalog-pricing-note">
+          <summary><span><Info size={15} /> Preços de referência <span className="pricing-note-description">· Podem variar com as ofertas e o dólar</span></span><ChevronDown size={15} /></summary>
+          <MarketPriceNotice quotes={remote.content.flatMap(item => item.marketPrice ? [item.marketPrice] : [])} />
+        </details>}
         <div className="catalog-toolbar">
           <div className="toolbar-label">
             {custom ? <Layers3 size={18} /> : <Box size={18} />}{' '}
@@ -229,10 +229,9 @@ export function CatalogPage({
             : 'resultados encontrados'}
         </p>
         {!custom && loading ? (
-          <div className="empty-state" role="status">
-            <Box size={32} />
-            <h3>Carregando catálogo...</h3>
-            <p>Consultando as caixas oficiais.</p>
+          <div className="catalog-loading" role="status">
+            <span className="sr-only">Carregando catálogo...</span>
+            <div className="case-grid" aria-hidden="true">{Array.from({ length: 8 }, (_, index) => <div className="catalog-card-skeleton" key={index}><div /><span /><span /></div>)}</div>
           </div>
         ) : !custom && error ? (
           <div className="empty-state" role="alert">
@@ -333,7 +332,7 @@ export function CatalogPage({
           </span>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 function BarChartIcon() {

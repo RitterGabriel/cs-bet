@@ -9,7 +9,7 @@ let renderer: ReactTestRenderer | undefined;
 async function mount(selected = items) {
   await act(async () => { renderer = create(<CatalogHeroShowcase items={selected} custom />); });
 }
-const image = () => renderer!.root.findByType('img').props.src;
+const image = () => renderer!.root.findAllByType('img')[0].props.src;
 const caption = () => renderer!.root.findByProps({ className: 'hero-image-caption' }).findByType('span').children.join('');
 beforeEach(() => {
   vi.useFakeTimers();

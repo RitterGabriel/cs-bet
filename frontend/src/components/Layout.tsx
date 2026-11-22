@@ -1,11 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import {
-  Activity,
   BarChart3,
   Box,
   Coins,
-  FlaskConical,
   Layers3,
   Package,
   ShieldCheck,
@@ -40,19 +38,17 @@ export function Layout() {
             </span>
             <span>
               CS<span className="cyan-text">BET</span>
-              <small>EXPLORE. DESCUBRA. APRENDA.</small>
+              <small>SIMULAÇÃO EDUCACIONAL · CS2</small>
             </span>
           </Link>
-          <div className="recent-activity">
-            <span className="activity-icon">
-              <Activity size={19} />
-            </span>
-            <div>
-              <span>Atividades recentes</span>
-              <small>Novas histórias em breve</small>
-            </div>
-            <span className="mini-tag">Em desenvolvimento</span>
-          </div>
+          <nav className="header-navigation" aria-label="Navegação principal">
+            <NavLink to="/official" className={({ isActive }) => isActive || location.pathname === '/' ? 'active' : ''}>
+              <Box size={17} /> Oficiais
+            </NavLink>
+            <NavLink to="/custom"><Layers3 size={17} /> Personalizadas</NavLink>
+            <NavLink to="/market"><Package size={17} /> Mercado</NavLink>
+            <NavLink to="/statistics"><BarChart3 size={17} /> Estatísticas</NavLink>
+          </nav>
           <div className="header-account">
             {user ? (
               <Link
@@ -97,33 +93,7 @@ export function Layout() {
             <ProfileMenu />
           </div>
         </div>
-        <div className="nav-row">
-          <div className="container nav-inner">
-            <nav aria-label="Navegação principal">
-              <NavLink
-                to="/official"
-                className={({ isActive }) =>
-                  isActive || location.pathname === '/' ? 'active' : ''
-                }
-              >
-                <Box size={18} /> Oficiais
-              </NavLink>
-              <NavLink to="/custom">
-                <Layers3 size={18} /> Personalizadas
-              </NavLink>
-              <NavLink to="/market">
-                <Package size={18} /> Mercado
-              </NavLink>
-              <NavLink to="/statistics">
-                <BarChart3 size={18} /> Estatísticas
-              </NavLink>
-            </nav>
-            <span className="educational-badge">
-              <FlaskConical size={15} /> Simulação <span>•</span> Sem dinheiro
-              real
-            </span>
-          </div>
-        </div>
+
       </header>
       {notice && (
         <div className="session-notice container" role="status">
