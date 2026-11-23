@@ -66,6 +66,12 @@ public class User {
 		balance = result;
 	}
 
+	public void spendCredits(BigDecimal amount) {
+		if (amount == null || amount.signum() <= 0 || amount.scale() > 2 || balance.compareTo(amount) < 0)
+			throw new IllegalArgumentException("Saldo fictício insuficiente.");
+		balance = balance.subtract(amount);
+	}
+
 	protected User() {
 	}
 }

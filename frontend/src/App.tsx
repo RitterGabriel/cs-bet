@@ -9,6 +9,7 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { InventoryPage } from './pages/InventoryPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { MarketPage } from './pages/MarketPage';
+import { AboutPage } from './pages/AboutPage';
 import { StatisticsPage } from './pages/StatisticsPage';
 
 export function App() {
@@ -26,6 +27,7 @@ export function App() {
         />
         <Route path="market" element={<MarketPage />} />
         <Route path="statistics" element={<StatisticsPage />} />
+        <Route path="about" element={<AboutPage />} />
         <Route path="cases/:id" element={<CaseDetailsPage />} />
         <Route path="login" element={<AuthPage key="login" />} />
         <Route path="register" element={<AuthPage key="register" register />} />

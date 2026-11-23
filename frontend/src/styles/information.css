@@ -1,0 +1,39 @@
+.probability-education { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+.education-heading { max-width: 760px; margin-bottom: 28px; }
+.education-heading h2 { font-size: clamp(1.9rem, 4vw, 2.8rem); letter-spacing: -.035em; line-height: 1.12; margin: 12px 0 16px; }
+.education-heading h2 em { color: var(--primary); font-style: normal; }
+.education-heading p { color: var(--muted); line-height: 1.8; font-size: .9rem; }
+.probability-education .education-grid h3 { font-size: 1.05rem; margin: 16px 0 12px; }
+.probability-education .education-grid .panel { min-height: 0; padding: 24px; }
+.about-hero { display: grid; grid-template-columns: 1.5fr 1fr; align-items: center; gap: 48px; padding: 20px 0 48px; }
+.about-heading h1 { font-size: clamp(2rem, 4vw, 3.4rem); letter-spacing: -.045em; line-height: 1.08; margin: 16px 0 24px; }
+.about-heading h1 em { color: var(--primary); font-style: normal; }
+.about-heading > p { max-width: 620px; font-size: .95rem; color: var(--muted); line-height: 1.9; margin-bottom: 26px; }
+.about-identity { min-height: 320px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: var(--primary); background: radial-gradient(ellipse, #00d4ff0c, transparent 65%); }
+.about-identity > svg { filter: drop-shadow(0 0 24px #00d4ff22); }
+.about-orbit { position: absolute; width: 270px; height: 270px; border: 1px solid #00d4ff18; border-radius: 50%; transform: rotate(-20deg); }
+.about-orbit::after { content: ''; position: absolute; inset: 18px; border: 1px dashed #7c3aed30; border-radius: 50%; }
+.about-identity > span:not(.about-orbit) { color: var(--text); font-size: 2rem; font-weight: 800; letter-spacing: -.05em; }
+.about-identity > span > span { color: var(--primary); }
+.about-identity small { color: var(--muted); font-size: .5rem; letter-spacing: .17em; }
+.about-principles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding: 32px 0; border-block: 1px solid var(--border); }
+.about-principles h2 { font-size: 1.1rem; margin: 16px 0 12px; }
+.about-principles p, .about-purpose p, .about-author p { color: var(--muted); font-size: .85rem; line-height: 1.9; }
+.about-purpose { display: flex; align-items: flex-start; gap: 20px; margin-block: 32px; padding: 28px; background: linear-gradient(110deg, #00d4ff06, transparent), var(--surface); }
+.about-purpose > svg { flex-shrink: 0; color: var(--primary); }
+.about-purpose h2 { margin: 0 0 12px; font-size: 1.2rem; }
+.about-purpose p { margin-bottom: 0; }
+.about-author { display: flex; justify-content: space-between; align-items: center; gap: 28px; padding: 24px 0; }
+.about-author h2 { margin: 10px 0; font-size: 1.7rem; letter-spacing: -.025em; }
+.about-social-links { display: flex; flex-wrap: wrap; gap: 12px; flex-shrink: 0; }
+.about-social-links .button { font-size: .8rem; }
+.about-attribution { color: var(--muted); font-size: .7rem; margin-top: 28px; }
+@media (max-width: 760px) {
+  .about-hero { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-bottom: 28px; }
+  .about-identity { display: none; }
+  .about-principles { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .about-author { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .about-purpose { padding: 20px; gap: 12px; }
+  .about-purpose > svg { width: 21px; }
+  .probability-education .education-grid .panel { padding: 22px; }
+}

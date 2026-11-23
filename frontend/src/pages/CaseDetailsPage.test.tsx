@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { AuthProvider } from '../contexts/AuthContext';
 import { MemoryRouter } from 'react-router';
 import { CaseDetailsContent } from './CaseDetailsPage';
 import type { CatalogCase, CaseItem } from '../types/catalog';
@@ -42,7 +43,7 @@ describe('conteúdo da caixa com grupo especial', () => {
   it('mantém skins comuns e substitui os 52 especiais por um único card dourado', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter>
-        <CaseDetailsContent item={box} />
+        <AuthProvider><CaseDetailsContent item={box} /></AuthProvider>
       </MemoryRouter>,
     );
     expect(html.match(/class="skin-market-card/g)).toHaveLength(2);
@@ -56,9 +57,9 @@ describe('conteúdo da caixa com grupo especial', () => {
   it('uma caixa sem itens especiais não recebe dourado nem chance inventada', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter>
-        <CaseDetailsContent
+        <AuthProvider><CaseDetailsContent
           item={{ ...box, specialItems: [], specialReward: null }}
-        />
+        /></AuthProvider>
       </MemoryRouter>,
     );
     expect(html).not.toContain('gold-special-card');

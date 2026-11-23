@@ -54,4 +54,12 @@ describe('API de inventário', () => {
       'incompletos',
     );
   });
+  it('envia maior e menor valor para ordenar todas as páginas no servidor', async () => {
+    for (const sort of ['PRICE_DESC', 'PRICE_ASC'] as const) {
+      fetchMock.mockResolvedValueOnce(Response.json(page));
+      await fetchInventory('test-token', 2, 'AVAILABLE', sort);
+      expect(fetchMock.mock.calls.at(-1)![0]).toBe(`/api/inventory/me?page=2&size=12&status=AVAILABLE&sort=${sort}`);
+    }
+  });
+
 });

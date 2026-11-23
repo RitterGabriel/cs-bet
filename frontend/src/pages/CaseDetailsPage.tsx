@@ -12,6 +12,7 @@ import { MarketPricePanel } from "../components/MarketPricePanel";
 import { OFFICIAL_ODDS_SOURCE } from "../services/officialOdds";
 import { GoldSpecialCard } from "../components/GoldSpecialCard";
 import { SkinGrid } from "../components/SkinGrid";
+import { DemoOpeningPanel } from "../components/opening/DemoOpeningPanel";
 import { NotFoundPage } from "./NotFoundPage";
 
 export function CaseDetailsPage() {
@@ -99,7 +100,7 @@ export function CaseDetailsContent({ item }: { item: CatalogCase }) {
         <span>{item.name}</span>
       </nav>
       <section
-        className="case-detail-hero"
+        className={`case-detail-hero${item.isReal ? " case-opening-hero" : ""}`}
         style={{ "--case-accent": item.accent } as CSSProperties}
       >
         <div className="detail-art">
@@ -139,12 +140,14 @@ export function CaseDetailsContent({ item }: { item: CatalogCase }) {
           <div className="info-box">
             <Info size={20} />
             <p>
-              Catálogo para consulta e aprendizado. A abertura de caixas não
-              está disponível.
+              {item.isReal
+                ? "Abra com créditos fictícios e receba uma skin virtual no seu inventário."
+                : "Coleção fictícia para consulta. Os itens ainda estão em preparação."}
             </p>
           </div>
         </div>
       </section>
+      {item.isReal && <DemoOpeningPanel key={item.id} box={item} />}
       {item.isReal && (
         <MarketPriceNotice
           quotes={[

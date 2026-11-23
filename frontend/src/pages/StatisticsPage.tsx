@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowDownLeft, ArrowUpRight, Box, Coins, History, LoaderCircle, LockKeyhole, Package, RefreshCw, ShieldCheck, Tag } from 'lucide-react';
+import { ProbabilityEducation } from '../components/ProbabilityEducation';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
 import { activityLabels, formatPersonalAmount, getPersonalStatistics } from '../services/statistics';
@@ -36,6 +37,7 @@ export function StatisticsPage() {
 
   const s = data?.summary;
   return <div className="container page-content personal-statistics-page">
+    <ProbabilityEducation />
     <div className="page-heading personal-statistics-heading">
       <span className="eyebrow">SUA JORNADA EM NÚMEROS</span>
       <h1>Minhas <em>estatísticas.</em></h1>
@@ -62,7 +64,7 @@ export function StatisticsPage() {
         <section className="panel personal-activity" aria-labelledby="activity-title">
           <div className="personal-activity-heading"><div><span className="eyebrow">TUDO EM UM SÓ LUGAR</span><h2 id="activity-title"><History size={21} /> Histórico da conta</h2></div>
             <label>Tipo de movimentação<select value={type} onChange={event => { setType(event.target.value as ActivityType); setPage(0); }}>
-              <option value="ALL">Todas as movimentações</option><option value="CREDIT_ADDITION">Créditos adicionados</option><option value="ITEM_OBTAINED">Itens recebidos</option><option value="ITEM_SOLD">Vendas fictícias</option>
+              <option value="ALL">Todas as movimentações</option><option value="CREDIT_ADDITION">Créditos adicionados</option><option value="CASE_OPENING">Aberturas de caixas</option><option value="ITEM_OBTAINED">Itens recebidos</option><option value="ITEM_SOLD">Vendas fictícias</option>
             </select></label>
           </div>
           <p className="muted statistics-history-help">Registros da sua conta, do mais recente para o mais antigo. O valor de uma venda é o registrado na operação, não a cotação atual.</p>

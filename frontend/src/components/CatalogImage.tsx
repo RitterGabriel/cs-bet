@@ -27,11 +27,13 @@ export function CatalogImage({
   alt,
   remote = false,
   item = false,
+  loading = 'lazy',
 }: {
   src: string;
   alt: string;
   remote?: boolean;
   item?: boolean;
+  loading?: 'lazy' | 'eager';
 }) {
   const [failed, setFailed] = useState('');
   const fallback = item
@@ -44,7 +46,7 @@ export function CatalogImage({
       alt={actual === fallback ? `Imagem ilustrativa de reserva: ${alt}` : alt}
       width="640"
       height="420"
-      loading="lazy"
+      loading={loading}
       referrerPolicy="no-referrer"
       onError={() => {
         if (actual !== fallback) setFailed(src);

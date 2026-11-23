@@ -1,5 +1,6 @@
 import type { MarketQuote } from '../services/market';
 import type { SimulatedPrice } from '../services/pricing';
+export type InventorySort = 'RECENT' | 'PRICE_ASC' | 'PRICE_DESC';
 export type InventoryStatus = 'AVAILABLE' | 'SOLD';
 
 export interface InventoryItem {
@@ -13,6 +14,8 @@ export interface InventoryItem {
   status: InventoryStatus;
   simulatedPrice?: SimulatedPrice | null;
   marketPrice?: MarketQuote;
+  salePrice?: string | null;
+  soldAt?: string | null;
 }
 
 export interface InventoryPageResponse {

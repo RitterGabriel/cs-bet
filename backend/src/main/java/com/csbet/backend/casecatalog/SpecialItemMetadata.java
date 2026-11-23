@@ -4,12 +4,16 @@ import java.util.*;
 import tools.jackson.databind.json.JsonMapper;
 
 /** Metadados de apresentação do snapshot fixado; não altera identidades ou chances. */
-final class SpecialItemMetadata {
+public final class SpecialItemMetadata {
     private static final Map<String,String> PHASES = loadPhases();
     private SpecialItemMetadata() { }
     static String phase(WeaponCase box, CaseItem link) {
         return link.isSpecial() && "BYMYKEL".equals(box.getSource()) && CatalogSourceLoader.REVISION.equals(box.getSourceRevision())
                 ? PHASES.get(link.getItem().getExternalId()) : null;
+    }
+    public static String knownPhase(WeaponCase box, String externalId) {
+        return "BYMYKEL".equals(box.getSource()) && CatalogSourceLoader.REVISION.equals(box.getSourceRevision())
+                ? PHASES.get(externalId) : null;
     }
     private static Map<String,String> loadPhases() {
         try (var input = SpecialItemMetadata.class.getResourceAsStream("/catalog/crates.json")) {

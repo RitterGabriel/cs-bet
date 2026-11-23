@@ -15,6 +15,7 @@ export type Rarity =
   | 'special';
 
 export interface CaseItem {
+  decorativeSpecial?: boolean;
   id: string;
   name: string;
   image: string;

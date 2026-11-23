@@ -34,6 +34,10 @@ public class InventoryItem {
     // Nulo para unidades antigas: desgaste/variante não podem ser inferidos a partir da skin.
     private Long marketVariantId;
 
+    @Enumerated(EnumType.STRING)
+    private com.csbet.backend.market.Wear wear;
+    @Column(length = 1) private String statTrak;
+    @Column(length = 120) private String phase;
     private LocalDateTime soldAt;
 
     // Snapshot do valor efetivo de uma futura venda, nunca o preço atual do catálogo.
@@ -49,6 +53,26 @@ public class InventoryItem {
         this.status = InventoryStatus.AVAILABLE;
     }
 
+    public InventoryItem(User owner, CosmeticItem skin, com.csbet.backend.market.MarketVariant variant, String phase) {
+        this(owner, skin);
+        if (!Objects.equals(skin.getId(), variant.getSkinId()) || variant.isSouvenir())
+            throw new IllegalArgumentException("Variante incompatível.");
+        this.marketVariantId = variant.getId();
+        this.wear = variant.getWear(); this.statTrak = variant.isStatTrak() ? "Y" : "N"; this.phase = phase;
+    }
+    public com.csbet.backend.market.Wear getWear() { return wear; }
+    public Boolean getStatTrak() { return statTrak == null ? null : "Y".equals(statTrak); }
+    public String getPhase() { return phase; }
+    public String getDisplayName() {
+        return (Boolean.TRUE.equals(getStatTrak()) ? "StatTrak™ " : "") + skin.getName()
+            + (phase == null ? "" : " · " + phase)
+            + (wear == null || wear == com.csbet.backend.market.Wear.NONE ? "" : " (" + wear + ")");
+    }
+    public void sell(BigDecimal amount, LocalDateTime now) {
+        if (status != InventoryStatus.AVAILABLE || amount == null || amount.signum() <= 0 || now.isBefore(obtainedAt))
+            throw new IllegalArgumentException("Item indisponível para venda.");
+        status = InventoryStatus.SOLD; salePrice = amount.setScale(2); soldAt = now;
+    }
     public Long getMarketVariantId() { return marketVariantId; }
     public Long getId() { return id; }
     public CosmeticItem getSkin() { return skin; }

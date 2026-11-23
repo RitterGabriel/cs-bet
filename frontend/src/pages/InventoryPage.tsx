@@ -1,21 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Link } from 'react-router';
 import { CalendarDays, LoaderCircle, Package } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { formatBRL } from '../services/market';
+import { formatBRL, quoteAvailable } from '../services/market';
 import { MarketPricePanel } from '../components/MarketPricePanel';
+import { sellInventoryItem, sellAllInventory } from '../services/inventory';
+import type { InventoryItem } from '../types/inventory';
 import { ApiError } from '../services/api';
 import { CatalogImage } from '../components/CatalogImage';
+import '../styles/inventory.css';
 import type {
   InventoryPageResponse,
   InventoryStatus,
+  InventorySort,
 } from '../types/inventory';
 
 export function InventoryPage() {
-  const { getInventory } = useAuth();
+  const { getInventory, user, refreshUser } = useAuth();
+  const [sellingId, setSellingId] = useState<number | null>(null);
+  const [saleMessage, setSaleMessage] = useState('');
+  const [saleError, setSaleError] = useState('');
+  const saleBusy = useRef(false);
+  const saleGeneration = useRef(0);
+  useEffect(() => {
+    saleGeneration.current++; saleBusy.current = false; setSellingId(null); setSaleMessage(''); setSaleError('');
+    return () => { saleGeneration.current++; };
+  }, [user?.id]);
   const [page, setPage] = useState(0);
   const [status, setStatus] = useState<InventoryStatus | ''>('');
+  const [sort, setSort] = useState<InventorySort>('RECENT');
   const [data, setData] = useState<InventoryPageResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -25,7 +39,7 @@ export function InventoryPage() {
     let active = true;
     setLoading(true);
     setError('');
-    getInventory(page, status || undefined)
+    getInventory(page, status || undefined, sort)
       .then((result) => {
         if (active) setData(result);
       })
@@ -43,7 +57,29 @@ export function InventoryPage() {
     return () => {
       active = false;
     };
-  }, [getInventory, page, status, retry]);
+  }, [getInventory, page, status, sort, retry]);
+
+  async function sell(item?: InventoryItem) {
+    if (saleBusy.current || !user) return;
+    saleBusy.current = true; const generation = saleGeneration.current;
+    setSellingId(item?.id ?? -1); setSaleMessage(''); setSaleError('');
+    try {
+      const receipt = item ? await sellInventoryItem(item, user.id) : await sellAllInventory(user.id);
+      if (generation !== saleGeneration.current) return;
+      setSaleMessage('soldItems' in receipt
+        ? `${receipt.soldItems} ${receipt.soldItems === 1 ? 'skin vendida' : 'skins vendidas'} por ${formatBRL(receipt.amount)} em créditos fictícios.${receipt.skippedItems > 0 ? ` ${receipt.skippedItems} ${receipt.skippedItems === 1 ? 'item sem cotação permaneceu' : 'itens sem cotação permaneceram'} no inventário.` : ''}`
+        : `Skin vendida por ${formatBRL(receipt.amount)} em créditos fictícios.`);
+      setPage(0); setRetry(value => value + 1);
+      // A venda já foi confirmada. Falha ao atualizar o cabeçalho não repete a operação.
+      void refreshUser().catch(() => { if (generation === saleGeneration.current) setSaleMessage('Venda concluída. Atualize a página para conferir o saldo.'); });
+    } catch (failure) {
+      if (generation !== saleGeneration.current) return;
+      setSaleError(failure instanceof ApiError && failure.status !== 0 ? failure.message : 'Não foi possível confirmar a venda. Tente novamente para recuperar a mesma operação, sem crédito duplicado.');
+      if (failure instanceof ApiError && failure.code === 'SALE_REJECTED') setRetry(value => value + 1);
+    } finally {
+      if (generation === saleGeneration.current) { saleBusy.current = false; setSellingId(null); }
+    }
+  }
 
   return (
     <div className="container page-content">
@@ -78,6 +114,11 @@ export function InventoryPage() {
           )}
         </section>
       )}
+      <div className="inventory-bulk-actions">
+        <div><h2>Venda suas skins virtuais</h2><p>Vender tudo inclui os itens disponíveis de todas as páginas, independentemente do filtro. Itens sem cotação vigente permanecem no inventário.</p></div>
+        <button type="button" className="button primary" disabled={loading || Boolean(error) || sellingId !== null || !data?.availableItems}
+          onClick={() => { void sell(); }}>{sellingId === -1 ? 'Vendendo tudo...' : 'Vender tudo'}</button>
+      </div>
       <div className="catalog-toolbar inventory-toolbar">
         <span className="toolbar-label">
           <Package size={18} />{' '}
@@ -85,6 +126,16 @@ export function InventoryPage() {
             ? 'Consultando inventário'
             : `${data?.totalElements ?? 0} ${(data?.totalElements ?? 0) === 1 ? 'item' : 'itens'}${status ? ' neste filtro' : ''}`}
         </span>
+        <div className="inventory-status-filter">
+          <label htmlFor="inventory-sort">Ordenar por</label>
+          <select id="inventory-sort" value={sort} onChange={event => {
+            setSort(event.target.value as InventorySort); setPage(0);
+          }}>
+            <option value="RECENT">Mais recentes</option>
+            <option value="PRICE_DESC">Maior valor</option>
+            <option value="PRICE_ASC">Menor valor</option>
+          </select>
+        </div>
         <div className="inventory-status-filter">
           <label htmlFor="inventory-status">Status</label>
           <select
@@ -101,7 +152,11 @@ export function InventoryPage() {
           </select>
         </div>
       </div>
+      {saleMessage && <p className="inventory-sale-notice" role="status">{saleMessage}</p>}
+      {saleError && <p className="inventory-sale-error" role="alert">{saleError}</p>}
       <InventoryContent
+        onSell={item => { void sell(item); }}
+        sellingId={sellingId}
         data={data}
         loading={loading}
         error={error}
@@ -120,7 +175,11 @@ export function InventoryContent({
   filtered = false,
   onRetry,
   onPageChange,
+  onSell,
+  sellingId = null,
 }: {
+  onSell?: (item: InventoryItem) => void;
+  sellingId?: number | null;
   data: InventoryPageResponse | null;
   loading: boolean;
   error: string;
@@ -205,6 +264,13 @@ export function InventoryContent({
               <span className="mini-tag">
                 {item.status === 'AVAILABLE' ? 'Disponível' : 'Vendido'}
               </span>
+              {item.status === 'AVAILABLE' && onSell && <button type="button" className="button primary inventory-sell-button"
+                disabled={sellingId !== null || !item.marketPrice || !quoteAvailable(item.marketPrice)}
+                onClick={() => onSell(item)}>
+                {sellingId === item.id ? 'Vendendo...' : item.marketPrice && quoteAvailable(item.marketPrice)
+                  ? `Vender por ${formatBRL(item.marketPrice.currentPrice!)}` : 'Sem cotação para venda'}
+              </button>}
+              {item.status === 'SOLD' && item.salePrice && <p className="inventory-sale-snapshot">Vendido por {formatBRL(item.salePrice)} em créditos fictícios.</p>}
             </div>
           </article>
         ))}

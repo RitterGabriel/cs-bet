@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router';
 import { InventoryContent } from './InventoryPage';
+import { openingSkin } from '../test/openingFixture';
 import type { InventoryPageResponse } from '../types/inventory';
 
 const empty: InventoryPageResponse = {
@@ -72,4 +73,20 @@ describe('estados do inventário', () => {
     expect(html).toContain('Unidade #2');
     expect(html).not.toContain('Vender');
   });
+  it('oferece venda pelo preço da variante e bloqueia itens sem cotação', () => {
+    const skin = { id: 1, skinId: 1, externalId: openingSkin.id, name: openingSkin.name, imageUrl: null,
+      rarity: openingSkin.rarityData!, obtainedAt: '2026-11-22T12:00:00Z', status: 'AVAILABLE' as const };
+    const data = { ...empty, totalElements: 2, totalPages: 1, content: [{ ...skin, marketPrice: openingSkin.marketPrices![0] }, { ...skin, id: 2 }] };
+    const html = view({ data, onSell: () => {} });
+    expect(html).toContain('Vender por'); expect(html).toContain('10,00');
+    expect(html).toContain('Sem cotação para venda');
+  });
+  it('mostra o preço efetivo da venda e não permite revender', () => {
+    const data = { ...empty, totalElements: 1, totalPages: 1, content: [{ id: 1, skinId: 1, externalId: openingSkin.id,
+      name: openingSkin.name, imageUrl: null, rarity: openingSkin.rarityData!, obtainedAt: '2026-11-22T12:00:00Z',
+      status: 'SOLD' as const, salePrice: '15.00', marketPrice: openingSkin.marketPrices![0] }] };
+    const html = view({ data, onSell: () => {} });
+    expect(html).toContain('Vendido por'); expect(html).toContain('15,00'); expect(html).not.toContain('Vender por');
+  });
+
 });

@@ -81,4 +81,32 @@ describe('painel pessoal de estatísticas', () => {
     expect(text()).not.toContain('900,00');
     expect(getPersonalStatistics).toHaveBeenLastCalledWith(2, 0, 'ALL');
   });
+  it('mostra a skin ganha, custo e saldo em uma única linha da abertura', async () => {
+    vi.mocked(getPersonalStatistics).mockResolvedValueOnce({ ...statisticsFixture,
+      activity: { page: 0, size: 20, totalElements: 1, totalPages: 1, content: [{
+        id: 'CASE_OPENING:1', type: 'CASE_OPENING', occurredAt: '2026-11-22T12:00:00Z',
+        itemName: 'StatTrak™ MP9 | Nexus (MW)', amount: '2.71', resultingBalance: '997.29',
+      }] } });
+    await mount();
+    const rows = renderer!.root.findByType('tbody').findAllByType('tr');
+    expect(rows).toHaveLength(1);
+    expect(text()).toContain('StatTrak™ MP9 | Nexus (MW)');
+    expect(text()).toContain('2,71'); expect(text()).toContain('997,29');
+    expect(rows[0].findAllByType('td').map(cell => cell.children.join('')).join(' ')).not.toContain('Item recebido');
+  });
+
+  it('recupera os conceitos acima do painel sem mudar métricas e histórico', async () => {
+    await mount();
+    expect(text()).toContain('Probabilidade'); expect(text()).toContain('25%');
+    expect(text()).toContain('Variação dos resultados'); expect(text()).toContain('Tentativas independentes');
+    expect(text().indexOf('probability-title')).toBeLessThan(text().indexOf('personal-statistics-heading'));
+    expect(text()).toContain('Histórico da conta'); expect(text()).toContain('900,00');
+    expect(getPersonalStatistics).toHaveBeenCalledTimes(1);
+  });
+  it('mantém a explicação educativa acessível sem login', async () => {
+    auth.user = null; await mount();
+    expect(text()).toContain('probability-title'); expect(text()).toContain('Acessar minha conta');
+    expect(getPersonalStatistics).not.toHaveBeenCalled();
+  });
+
 });

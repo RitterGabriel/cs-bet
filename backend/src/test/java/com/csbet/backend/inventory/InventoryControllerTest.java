@@ -95,7 +95,7 @@ class InventoryControllerTest {
                 .andExpect(jsonPath("$..owner").doesNotExist())
                 .andExpect(jsonPath("$..passwordHash").doesNotExist())
                 .andExpect(jsonPath("$..email").doesNotExist())
-                .andExpect(jsonPath("$..salePrice").doesNotExist());
+                .andExpect(jsonPath("$.content[0].salePrice").isEmpty());
         verify(repository).findByOwnerId(eq(1L), any(Pageable.class));
         mvc.perform(get("/api/inventory/me").header("Authorization", bearer(2L)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(1))
@@ -143,4 +143,17 @@ class InventoryControllerTest {
         assertThat(response.externalId()).isEqualTo("skin-fixture");
         assertThat(response.obtainedAt().getOffset()).isEqualTo(java.time.ZoneOffset.UTC);
     }
+    @Test
+    void priceSortIsValidatedAndPassedToOwnedPaginatedQuery() throws Exception {
+        when(repository.findOwnedByPrice(anyLong(),nullable(InventoryStatus.class),any(),anyString(),any(Pageable.class)))
+            .thenAnswer(call -> page(owned.getOrDefault(call.getArgument(0),List.of()),call.getArgument(4)));
+        for(String direction:List.of("PRICE_ASC","PRICE_DESC")) {
+            mvc.perform(get("/api/inventory/me").param("sort",direction).param("status","AVAILABLE").param("page","1").param("size","1")
+                    .param("userId","2").header("Authorization",bearer(1L)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.content[0].id").value(102));
+            verify(repository).findOwnedByPrice(eq(1L),eq(InventoryStatus.AVAILABLE),any(),eq(direction),argThat(p->p.getPageNumber()==1&&p.getPageSize()==1));
+        }
+        mvc.perform(get("/api/inventory/me").param("sort","UNKNOWN").header("Authorization",bearer(1L))).andExpect(status().isBadRequest());
+    }
+
 }

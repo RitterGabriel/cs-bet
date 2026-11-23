@@ -11,6 +11,7 @@ export class ApiError extends Error {
   constructor(
     public readonly status: number,
     message: string,
+    public readonly code?: string,
   ) {
     super(message);
   }
@@ -19,6 +20,7 @@ export class ApiError extends Error {
 export async function request<T>(
   path: string,
   options: RequestInit = {},
+  serverErrorMessage = false,
 ): Promise<T> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 12000);
@@ -39,10 +41,20 @@ export async function request<T>(
         409: 'Este nome de usuário ou e-mail já está cadastrado.',
         429: 'Muitas tentativas. Aguarde um momento antes de tentar novamente.',
       };
+      let message: string | undefined;
+      let code: string | undefined;
+      if (serverErrorMessage) {
+        try {
+          const error = await response.json() as { message?: unknown; code?: unknown };
+          if (typeof error.code === 'string' && /^[A-Z_]{1,50}$/.test(error.code)) code = error.code;
+          if (typeof error.message === 'string' && error.message.length <= 500) message = error.message;
+        } catch { /* Resposta sem JSON: usa mensagem padrão. */ }
+      }
       throw new ApiError(
         response.status,
-        messages[response.status] ??
+        message ?? messages[response.status] ??
           'O serviço está indisponível. Tente novamente mais tarde.',
+        code,
       );
     }
     return (await response.json()) as T;

@@ -3,7 +3,7 @@ import { request } from './api';
 export interface WalletBalance { balance: string }
 export interface WalletMovement {
   id: number;
-  type: 'CREDIT_ADDITION';
+  type: 'CREDIT_ADDITION' | 'CASE_OPENING' | 'ITEM_SALE';
   amount: string;
   resultingBalance: string;
   createdAt: string;

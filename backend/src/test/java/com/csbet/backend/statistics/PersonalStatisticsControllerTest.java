@@ -62,7 +62,7 @@ class PersonalStatisticsControllerTest {
         verifyNoInteractions(statistics, inventory);
     }
     @Test
-    void onlyJwtOwnerIsUsedAndMissingOpeningDataIsNotInvented() throws Exception {
+    void onlyJwtOwnerIsUsedAndOpeningTotalsComeFromPersistedDebits() throws Exception {
         mvc.perform(get("/api/statistics/me?userId=2").header("Authorization", bearer(1)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.summary.balance").value("42.00"))
                 .andExpect(jsonPath("$.summary.creditsAdded").value("100.00"))
@@ -70,9 +70,9 @@ class PersonalStatisticsControllerTest {
                 .andExpect(jsonPath("$.summary.inventoryEstimatedValue").value("20.00"))
                 .andExpect(jsonPath("$.summary.soldItems").value(1))
                 .andExpect(jsonPath("$.summary.salesTotal").value("15.00"))
-                .andExpect(jsonPath("$.summary.openingHistoryAvailable").value(false))
-                .andExpect(jsonPath("$.summary.openedCases").isEmpty())
-                .andExpect(jsonPath("$.summary.openingSpend").isEmpty())
+                .andExpect(jsonPath("$.summary.openingHistoryAvailable").value(true))
+                .andExpect(jsonPath("$.summary.openedCases").value(0))
+                .andExpect(jsonPath("$.summary.openingSpend").value("0.00"))
                 .andExpect(jsonPath("$.activity.content[0].id").value("CREDIT_ADDITION:1"))
                 .andExpect(jsonPath("$..passwordHash").doesNotExist()).andExpect(jsonPath("$..email").doesNotExist());
         verify(statistics).walletTotals(1L);
@@ -115,7 +115,7 @@ class PersonalStatisticsControllerTest {
         mvc.perform(get("/api/statistics/me").header("Authorization", bearer(1)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.summary.salesTotal").value("0.00"))
                 .andExpect(jsonPath("$.summary.inventoryEstimatedValue").value("0.00"))
-                .andExpect(jsonPath("$.summary.openedCases").isEmpty())
+                .andExpect(jsonPath("$.summary.openedCases").value(0))
                 .andExpect(jsonPath("$.activity.totalElements").value(0))
                 .andExpect(jsonPath("$.activity.content").isEmpty());
     }

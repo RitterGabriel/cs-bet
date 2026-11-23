@@ -15,7 +15,8 @@ public class InventoryController {
     @GetMapping("/me")
     public InventoryPage me(@AuthenticationPrincipal Jwt jwt, @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "12") int size,
-                            @RequestParam(required = false) InventoryStatus status) {
-        return service.findOwned(Long.valueOf(jwt.getSubject()), page, size, status);
+                            @RequestParam(required = false) InventoryStatus status,
+                            @RequestParam(defaultValue = "RECENT") InventorySort sort) {
+        return service.findOwned(Long.valueOf(jwt.getSubject()), page, size, status, sort);
     }
 }

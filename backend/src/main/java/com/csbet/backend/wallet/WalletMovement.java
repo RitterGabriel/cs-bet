@@ -36,6 +36,16 @@ public class WalletMovement {
         this.createdAt = LocalDateTime.now(ZoneOffset.UTC);
         this.requestId = requestId;
     }
+    public static WalletMovement opening(User user, BigDecimal amount, String requestId) {
+        var movement = new WalletMovement(user, amount, requestId);
+        movement.type = "CASE_OPENING";
+        return movement;
+    }
+    public static WalletMovement sale(User user, BigDecimal amount, String requestId) {
+        var movement = new WalletMovement(user, amount, requestId);
+        movement.type = "ITEM_SALE";
+        return movement;
+    }
     public Long getId() { return id; }
     public String getType() { return type; }
     public BigDecimal getAmount() { return amount; }

@@ -14,6 +14,7 @@ import { fetchInventory } from '../services/inventory';
 import type {
   InventoryPageResponse,
   InventoryStatus,
+  InventorySort,
 } from '../types/inventory';
 import type { LoginRequest, UserResponse } from '../types/api';
 
@@ -37,6 +38,7 @@ interface AuthValue {
   getInventory: (
     page: number,
     status?: InventoryStatus,
+    sort?: InventorySort,
   ) => Promise<InventoryPageResponse>;
 }
 const AuthContext = createContext<AuthValue | undefined>(undefined);
@@ -116,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session, expire]);
 
   const getInventory = useCallback(
-    async (page: number, status?: InventoryStatus) => {
+    async (page: number, status?: InventoryStatus, sort?: InventorySort) => {
       if (!session || Date.now() >= session.expiresAt) {
         expire();
         throw new ApiError(
@@ -126,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const attempt = revision.current;
       try {
-        const data = await fetchInventory(session.token, page, status);
+        const data = await fetchInventory(session.token, page, status, sort);
         if (attempt !== revision.current)
           throw new ApiError(401, 'A sessão foi encerrada.');
         setInventoryEstimate(data.estimatedAvailableTotal);

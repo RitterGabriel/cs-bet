@@ -31,11 +31,11 @@ public class PersonalStatisticsService {
         var sales = statistics.salesTotals(ownerId);
         var valuation = inventory.estimateAvailable(ownerId, InventoryStatus.AVAILABLE,
                 LocalDateTime.ofInstant(clock.instant(), ZoneOffset.UTC));
-        // O motor estatístico não grava aberturas nem débitos: não inferir gastos a partir de cotações ou itens recebidos.
+        // Somente débitos persistidos por abertura, nunca cotações nem itens antigos.
         var summary = new Summary(user.getBalance().setScale(2), wallet.added(), wallet.movements(),
                 valuation.availableItems(), valuation.estimatedTotal(),
                 valuation.unpricedItems() == null ? 0 : valuation.unpricedItems(), sales.count(),
-                sales.unvalued() > 0 ? null : sales.total(), sales.unvalued(), false, null, null);
+                sales.unvalued() > 0 ? null : sales.total(), sales.unvalued(), true, wallet.opened(), wallet.spent());
         long total = statistics.activityCount(ownerId, type);
         var activity = new ActivityPage(statistics.activity(ownerId, type, page, size), page, size,
                 total, (int) ((total + size - 1) / size));

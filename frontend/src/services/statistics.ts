@@ -1,6 +1,6 @@
 import { api, ApiError, request } from './api';
 
-export type ActivityType = 'ALL' | 'CREDIT_ADDITION' | 'ITEM_OBTAINED' | 'ITEM_SOLD';
+export type ActivityType = 'ALL' | 'CREDIT_ADDITION' | 'CASE_OPENING' | 'ITEM_OBTAINED' | 'ITEM_SOLD';
 export interface PersonalSummary {
   balance: string;
   creditsAdded: string;
@@ -28,7 +28,7 @@ export interface PersonalStatistics {
   activity: { content: PersonalActivity[]; page: number; size: number; totalElements: number; totalPages: number };
 }
 export const activityLabels = {
-  CREDIT_ADDITION: 'Créditos adicionados', ITEM_OBTAINED: 'Item recebido', ITEM_SOLD: 'Venda fictícia',
+  CREDIT_ADDITION: 'Créditos adicionados', CASE_OPENING: 'Abertura de caixa', ITEM_OBTAINED: 'Item recebido', ITEM_SOLD: 'Venda fictícia',
 };
 const money = (value: unknown): value is string => typeof value === 'string' && /^\d{1,38}(\.\d{1,2})?$/.test(value);
 const count = (value: unknown): value is number => Number.isSafeInteger(value) && Number(value) >= 0;

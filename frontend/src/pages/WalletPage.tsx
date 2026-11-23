@@ -192,7 +192,7 @@ export function WalletHistoryContent({ history, loading }: {
     <section className="panel wallet-history">
       <div className="wallet-section-heading">
         <span className="wallet-icon"><ArrowDownLeft size={22} /></span>
-        <div><h2>Histórico de movimentações</h2><p>Acompanhe os créditos adicionados à sua simulação.</p></div>
+        <div><h2>Histórico de movimentações</h2><p>Adições de créditos e gastos em aberturas virtuais.</p></div>
       </div>
       {loading ? <p role="status">Carregando histórico...</p> : history && (
         history.content.length === 0 ? <p>Nenhuma movimentação registrada.</p> : (
@@ -205,8 +205,8 @@ export function WalletHistoryContent({ history, loading }: {
                 {history.content.map(item => (
                   <tr key={item.id}>
                     <td>{new Date(item.createdAt).toLocaleString('pt-BR')}</td>
-                    <td><span className="wallet-movement-type">Adição de créditos</span></td>
-                    <td>{formatWalletAmount(item.amount)}</td>
+                    <td><span className="wallet-movement-type">{item.type === 'CASE_OPENING' ? 'Abertura de caixa' : item.type === 'ITEM_SALE' ? 'Venda fictícia de skin' : 'Adição de créditos'}</span></td>
+                    <td>{item.type === 'CASE_OPENING' ? '− ' : '+ '}{formatWalletAmount(item.amount)}</td>
                     <td>{formatWalletAmount(item.resultingBalance)}</td>
                   </tr>
                 ))}

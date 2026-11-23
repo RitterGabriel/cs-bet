@@ -279,3 +279,7 @@
   .catalog-card-skeleton > div, .showcase-progress > span, .catalog-experience .showcase-stage > img { animation: none !important; }
   .catalog-experience .case-card:hover, .catalog-experience .case-card:focus-within, .catalog-experience .case-card:hover .case-art > img { transform: none; }
 }
+@media (max-width: 380px) {
+  .site-header .header-navigation { gap: 0; }
+  .site-header .header-navigation a { padding-inline: 3px; }
+}

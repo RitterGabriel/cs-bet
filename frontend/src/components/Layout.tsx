@@ -5,6 +5,7 @@ import {
   Box,
   Coins,
   Layers3,
+  Info,
   Package,
   ShieldCheck,
   X,
@@ -48,6 +49,7 @@ export function Layout() {
             <NavLink to="/custom"><Layers3 size={17} /> Personalizadas</NavLink>
             <NavLink to="/market"><Package size={17} /> Mercado</NavLink>
             <NavLink to="/statistics"><BarChart3 size={17} /> Estatísticas</NavLink>
+            <NavLink to="/about"><Info size={17} /> Sobre</NavLink>
           </nav>
           <div className="header-account">
             {user ? (

@@ -28,7 +28,7 @@ public class WalletService {
         User user = users.findByIdForUpdate(userId).orElseThrow(() -> new BadCredentialsException("Não autenticado."));
         var previous = movements.findByUserIdAndRequestId(userId, request.requestId().toString());
         if (previous.isPresent()) {
-            if (previous.get().getAmount().compareTo(request.amount()) != 0)
+            if (!"CREDIT_ADDITION".equals(previous.get().getType()) || previous.get().getAmount().compareTo(request.amount()) != 0)
                 throw new IllegalArgumentException("Identificador já utilizado com outro valor.");
             return new WalletResponse.Balance(user.getBalance().toPlainString());
         }

@@ -35,3 +35,25 @@ describe('imports e rotas da aplicação', () => {
     expect(renderRoute('/cases/crate-fever')).toContain('Carregando caixa...');
   });
 });
+
+describe('conteúdo educativo e Sobre', () => {
+  it('mostra a explicação de probabilidades acima do painel atual', () => {
+    const html = renderRoute('/statistics');
+    expect(html).toContain('probability-title');
+    expect(html).toContain('Tentativas independentes');
+    expect(html.indexOf('probability-title')).toBeLessThan(html.indexOf('Minhas '));
+    expect(html).toContain('Verificando sessão');
+  });
+  it('Sobre é público, fica ao lado de Estatísticas e apresenta propósito e redes do autor', () => {
+    const html = renderRoute('/about');
+    expect(html).toContain('simulador educacional');
+    expect(html).toContain('Não representam dinheiro real');
+    expect(html).toContain('https://github.com/RitterGabriel');
+    expect(html).toContain('href="https://www.linkedin.com/in/rittergabriel/"');
+    expect(html).toContain('LinkedIn');
+    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html.indexOf('href="/statistics"')).toBeLessThan(html.indexOf('href="/about"'));
+    expect(html).not.toContain('Página não encontrada');
+    expect(html).not.toContain('Carregando suas estatísticas');
+  });
+});
