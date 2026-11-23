@@ -28,6 +28,11 @@ public class WeaponCase {
         this.sourceRevision = revision; this.language = language; this.specialNotice = specialNotice;
         this.category = "official"; this.type = "Case"; this.importedAt = LocalDateTime.now(java.time.Clock.systemUTC());
     }
+    public void updateCustom(String name,String description,String image,String version) {
+        if(!"CSBET".equals(source))throw new IllegalArgumentException("Origem personalizada inválida.");
+        update(name,description,image,version,"pt-BR","Caixa fictícia criada pelo CS Bet. Chances próprias por item; variantes limitadas às opções publicadas.");
+        category="custom";
+    }
     public Long getId() { return id; }
     public String getExternalId() { return externalId; }
     public String getSource() { return source; }

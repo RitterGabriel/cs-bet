@@ -39,7 +39,7 @@ export function useDemoOpening(box: CatalogCase, userId: number | undefined, qua
         return;
       }
       const results = outcome.results;
-      const reels = results.map(result => buildOpeningReel(box.items, result.item, box.specialItems.length > 0));
+      const reels = results.map(result => buildOpeningReel(box.items.length ? box.items : box.specialItems, result.item, box.specialItems.length > 0));
       const [reel] = reels;
       commit({ ...initialState(), runId: attempt, phase: 'preparing', result: results[0], reel, results, reels });
       const failedImages = await prepareOpeningImages(reels.flatMap(reel => reel.cards));

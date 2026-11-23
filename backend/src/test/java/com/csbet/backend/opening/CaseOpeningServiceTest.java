@@ -27,7 +27,7 @@ class CaseOpeningServiceTest {
     CaseOpeningRepository openings = mock(CaseOpeningRepository.class);
     final Instant now = Instant.parse("2026-11-22T12:00:00Z");
     CaseOpeningService service = new CaseOpeningService(users, cases, skins, simulation, variants, new VariantSelector(),
-            inventory, movements, openings, Clock.fixed(now, ZoneOffset.UTC));
+            inventory, movements, openings, Clock.fixed(now, ZoneOffset.UTC), mock(CustomCaseService.class));
     User owner;
     WeaponCase box;
     CosmeticItem skin;

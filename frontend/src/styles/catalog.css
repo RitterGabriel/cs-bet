@@ -283,3 +283,8 @@
   .site-header .header-navigation { gap: 0; }
   .site-header .header-navigation a { padding-inline: 3px; }
 }
+.custom-case-price strong, .custom-opening-price strong { color: var(--primary); font-variant-numeric: tabular-nums; }
+.custom-opening-price { display: grid; gap: 6px; }
+.custom-opening-price > span { font-size: .65rem; color: var(--muted); }
+.custom-opening-price > strong { font-size: 1.25rem; }
+.custom-case-notice { margin-bottom: 24px; font-size: .8rem; }

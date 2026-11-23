@@ -6,6 +6,7 @@ import { ApiError, request } from './api';
 import { validatePrice } from './pricing';
 import type { SimulatedPrice, PriceRange } from './pricing';
 import type { CaseItem, CatalogCase, Rarity } from '../types/catalog';
+import { customCaseArt } from '../data/customCaseArt';
 
 export interface OfficialCaseSummary {
   id: string;
@@ -179,3 +180,45 @@ export async function getOfficialCase(id: string): Promise<CatalogCase> {
     imageNotice: result.imageNotice,
   };
 }
+
+interface CustomSummary {
+  id: string; name: string; description: string; imageUrl: string; accent: string;
+  openingPrice: string; available: boolean; itemCount: number; ruleVersion: string;
+}
+interface CustomItem extends Omit<OfficialItem, 'dropChance'> { customChance: string }
+export function mapCustomCase(box: CustomSummary): CatalogCase {
+  if (!box || !box.id?.startsWith('custom-') || !box.name || !/^\d{1,16}\.\d{2}$/.test(box.openingPrice) ||
+      BigInt(box.openingPrice.replace('.', '')) <= 0n || !/^#[a-f\d]{6}$/i.test(box.accent) ||
+      typeof box.available !== 'boolean' || !Number.isSafeInteger(box.itemCount) || box.itemCount < 0 ||
+      typeof box.ruleVersion !== 'string' || !box.imageUrl?.startsWith('/images/'))
+    throw new ApiError(0, 'Caixa personalizada inválida na resposta.');
+  return { id: box.id, name: box.name, description: box.description, image: customCaseArt[box.id] ?? box.imageUrl, accent: box.accent,
+    category: 'custom', theme: box.name.toUpperCase(), items: [], specialItems: [], isReal: false,
+    customPrice: box.openingPrice, customReady: box.available, source: 'CSBET', sourceRevision: box.ruleVersion };
+}
+export async function listCustomCases(page: number, search: string, sort: string): Promise<CatalogPageResponse> {
+  const query = new URLSearchParams({ page: String(page), search: search.trim(), sort });
+  const result = await request<Omit<CatalogPageResponse, 'content'> & { content: CustomSummary[] }>(`/custom-cases?${query}`);
+  if (!result || !Array.isArray(result.content) || !Number.isSafeInteger(result.totalElements) || result.totalElements < 0 ||
+      !Number.isInteger(result.totalPages) || result.totalPages < 0 || result.page !== page || result.size !== 12)
+    throw new ApiError(0, 'Catálogo personalizado inválido na resposta.');
+  return { ...result, content: result.content.map(mapCustomCase) };
+}
+export async function getCustomCase(id: string): Promise<CatalogCase> {
+  const result = await request<{ box: CustomSummary; items: CustomItem[]; notice: string }>(`/custom-cases/${encodeURIComponent(id)}`);
+  const box = mapCustomCase(result?.box);
+  if (box.id !== id || !Array.isArray(result.items) || result.items.length !== result.box.itemCount ||
+      new Set(result.items.map(item => item.id)).size !== result.items.length)
+    throw new ApiError(0, 'Conteúdo personalizado inválido na resposta.');
+  const items = result.items.map(item => {
+    if (typeof item.customChance !== 'string' || !/^\d{1,3}\.\d{2}$/.test(item.customChance) ||
+        Number(item.customChance) <= 0 || Number(item.customChance) > 100 || typeof item.special !== 'boolean')
+      throw new ApiError(0, 'Chance personalizada inválida.');
+    return { ...mapItem(item), customChance: item.customChance };
+  });
+  if (box.customReady && items.reduce((sum, item) => sum + BigInt(item.customChance.replace('.', '')), 0n) !== 10000n)
+    throw new ApiError(0, 'As chances personalizadas estão incompletas.');
+  return { ...box, items: items.filter(item => item.specialCategory === 'none'),
+    specialItems: items.filter(item => item.specialCategory !== 'none'), specialNotice: result.notice };
+}
+export const getCatalogCase = (id: string) => id.startsWith('custom-') ? getCustomCase(id) : getOfficialCase(id);

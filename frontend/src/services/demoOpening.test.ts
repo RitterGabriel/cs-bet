@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { requestDemoOpening, requestOpeningBatch } from './demoOpening';
-import { getOfficialCase } from './catalog';
+import { getCatalogCase } from './catalog';
 import { openingResponse, openingBatchResponse, memoryOpeningStorage, openingBox, openingSkin, openingUser } from '../test/openingFixture';
-vi.mock('./catalog', () => ({ getOfficialCase: vi.fn() }));
+vi.mock('./catalog', () => ({ getCatalogCase: vi.fn() }));
 const fetchMock = vi.fn();
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock); vi.stubGlobal('window', { setTimeout, clearTimeout });
@@ -54,9 +54,9 @@ describe('abertura persistida com variante definida pelo servidor', () => {
   });
   it('recupera catálogo desatualizado sem uma segunda abertura', async () => {
     session(); fetchMock.mockResolvedValueOnce(Response.json(openingResponse(true)));
-    vi.mocked(getOfficialCase).mockResolvedValueOnce(openingBox);
+    vi.mocked(getCatalogCase).mockResolvedValueOnce(openingBox);
     const outcome = await requestDemoOpening({ ...openingBox, specialItems: [] }, 1);
-    expect(outcome.status).toBe('AVAILABLE'); expect(getOfficialCase).toHaveBeenCalledTimes(1);
+    expect(outcome.status).toBe('AVAILABLE'); expect(getCatalogCase).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls.filter(call => call[1].method === 'POST')).toHaveLength(1);
   });
   it('mantém falta de preço da variante sem usar faixa de outras variantes', async () => {

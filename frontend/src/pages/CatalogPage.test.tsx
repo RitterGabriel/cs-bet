@@ -3,10 +3,10 @@ import type { ReactTestRenderer } from 'react-test-renderer';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CatalogPage } from './CatalogPage';
-import { listOfficialCases } from '../services/catalog';
+import { listOfficialCases, listCustomCases } from '../services/catalog';
 import { cases } from '../data/cases';
 
-vi.mock('../services/catalog', () => ({ listOfficialCases: vi.fn() }));
+vi.mock('../services/catalog', () => ({ listOfficialCases: vi.fn(), listCustomCases: vi.fn() }));
 let renderer: ReactTestRenderer | undefined;
 const official = cases.filter(item => item.category === 'official').map((item, index) => ({ ...item, id: `crate-${index}`, isReal: true }));
 async function mount(category: 'official' | 'custom' = 'official') {
@@ -17,6 +17,7 @@ beforeEach(() => {
   vi.useFakeTimers();
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('window', { setTimeout, clearTimeout, setInterval, clearInterval });
+  vi.mocked(listCustomCases).mockResolvedValue({ content: [{ ...cases.find(item => item.category === 'custom')!, id: 'custom-all-win', name: 'All Win', customPrice: '3.00', customReady: true }], page: 0, size: 12, totalElements: 14, totalPages: 2 });
   vi.mocked(listOfficialCases).mockImplementation(async (page, search) => ({ content: search ? [official[0]] : official,
     page, size: 12, totalElements: search ? 1 : 42, totalPages: search ? 1 : 4 }));
 });
@@ -41,11 +42,12 @@ describe('catálogo redesenhado', () => {
     expect(listOfficialCases).toHaveBeenLastCalledWith(1, '', 'featured');
     expect(JSON.stringify(renderer!.toJSON())).not.toContain('Abrir caixa');
   });
-  it('mantém personalizadas locais e o atalho do histórico pessoal', async () => {
+  it('consulta personalizadas reais com preço fictício e preserva o histórico', async () => {
     await mount('custom');
     expect(listOfficialCases).not.toHaveBeenCalled();
     const html = JSON.stringify(renderer!.toJSON());
-    expect(html).toContain('Coleção AK-47');
+    expect(listCustomCases).toHaveBeenCalledWith(0, '', 'featured');
+    expect(html).toContain('All Win'); expect(html).toContain('3,00');
     expect(html).toContain('Meu histórico');
     expect(html).toContain('/statistics');
   });

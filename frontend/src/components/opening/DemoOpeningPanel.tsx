@@ -25,7 +25,7 @@ export function DemoOpeningPanel({ box }: { box: CatalogCase }) {
     synced.current = state.result.inventoryId;
     void Promise.allSettled([refreshUser(), getInventory(0)]);
   }, [state.result, refreshUser, getInventory]);
-  const price = box.marketPrice && quoteAvailable(box.marketPrice) ? box.marketPrice.currentPrice : null;
+  const price = box.customReady ? box.customPrice ?? null : box.marketPrice && quoteAvailable(box.marketPrice) ? box.marketPrice.currentPrice : null;
   const totalPrice = price ? (() => {
     const cents = BigInt(price.replace('.', '')) * BigInt(quantity);
     return `${cents / 100n}.${(cents % 100n).toString().padStart(2, '0')}`;
@@ -40,7 +40,7 @@ export function DemoOpeningPanel({ box }: { box: CatalogCase }) {
     <div className={`opening-roulettes${quantity === 10 ? ' is-multiple is-ten' : quantity > 1 ? ' is-multiple' : ''}`}>
       {Array.from({ length: quantity }, (_, index) => <div className="opening-lane" key={index}>
         {quantity > 1 && <span className="opening-lane-label">Caixa {index + 1}</span>}
-        <OpeningRoulette items={box.items} hasSpecialGroup={box.specialItems.length > 0} reel={state.reels[index] ?? null} phase={state.phase} runId={state.runId} failedImages={state.failedImages} onComplete={runId => finish(runId, index)} />
+        <OpeningRoulette items={box.items.length ? box.items : box.specialItems} hasSpecialGroup={box.specialItems.length > 0} reel={state.reels[index] ?? null} phase={state.phase} runId={state.runId} failedImages={state.failedImages} onComplete={runId => finish(runId, index)} />
       </div>)}
     </div>
     <div className="opening-panel-controls">
@@ -62,6 +62,6 @@ export function DemoOpeningPanel({ box }: { box: CatalogCase }) {
     {(!available || state.phase === 'unavailable') && <p className="opening-unavailable" role="status">Esta caixa não tem dados suficientes para uma abertura demonstrativa verificável.</p>}
     {state.error && <div className="opening-error" role="alert"><p>{state.error}</p>{state.authError && <Link to="/login" state={{ from: location.pathname }}>Entrar novamente</Link>}</div>}
     <p className="opening-educational-notice">{DEMO_OPENING_NOTICE}</p>
-    <details className="opening-rules"><summary>Como funciona o sorteio</summary><p>A roleta é visual. A frequência dos cards dourados na animação não representa a chance de obter um item especial. O resultado é definido no servidor antes da animação. As raridades seguem as probabilidades documentadas; itens especiais usam a regra interna 1/N. Desgaste é uniforme entre os desgastes cadastrados; com ou sem StatTrak é uniforme entre as opções cadastradas para aquele desgaste. São regras internas do CS Bet, não distribuições oficiais de variantes. Não há itens Souvenir. A fase, quando existente, pertence ao item selecionado. Cotações vencidas não excluem variantes do sorteio; se faltar cotação da variante recebida, seu preço será exibido como indisponível.</p></details>
+    <details className="opening-rules"><summary>Como funciona o sorteio</summary><p>A roleta é visual. A frequência dos cards dourados na animação não representa a chance de obter um item especial. O resultado é definido no servidor antes da animação. {box.category === 'custom' ? 'Os itens seguem as chances próprias publicadas nesta caixa, sem aplicar as chances de raridade das caixas oficiais. As variantes possíveis são apenas as exibidas no conteúdo da caixa.' : 'As raridades seguem as probabilidades documentadas; itens especiais usam a regra interna 1/N.'} Desgaste é uniforme entre os desgastes cadastrados; com ou sem StatTrak é uniforme entre as opções cadastradas para aquele desgaste. São regras internas do CS Bet, não distribuições oficiais de variantes. Não há itens Souvenir. A fase, quando existente, pertence ao item selecionado. Cotações vencidas não excluem variantes do sorteio; se faltar cotação da variante recebida, seu preço será exibido como indisponível.</p></details>
   </section>;
 }

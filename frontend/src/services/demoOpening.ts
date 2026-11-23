@@ -1,5 +1,5 @@
 import { api, ApiError, request } from './api';
-import { getOfficialCase } from './catalog';
+import { getCatalogCase } from './catalog';
 import { verifiedDropChance, verifiedSpecialReward } from './officialOdds';
 import type { CatalogCase } from '../types/catalog';
 import { isCreditAmount } from './pricing';
@@ -10,6 +10,8 @@ export const DEMO_OPENING_NOTICE = 'Simulação com créditos fictícios. A aber
 const invalidResult = () => new ApiError(0, 'Não foi possível validar o resultado demonstrativo. Tente novamente.');
 
 export function demoOpeningAvailable(box: CatalogCase): boolean {
+  if (box.category === 'custom') return box.customReady === true && !!box.customPrice &&
+    [...box.items, ...box.specialItems].length > 0 && [...box.items, ...box.specialItems].every(item => item.customChance !== undefined);
   return box.isReal === true && box.category === 'official' && box.items.length > 0 &&
     verifiedSpecialReward(box.specialReward) !== null && box.items.every(item => verifiedDropChance(item.dropChance) !== null);
 }
@@ -23,7 +25,7 @@ export async function requestDemoOpening(box: CatalogCase, expectedUserId: numbe
   const key = `csbet:pending-opening:${expectedUserId}:${box.id}`;
   const stored = localStorage.getItem(key);
   const pending: { requestId: string; expectedPrice: string } = stored ? JSON.parse(stored) : {
-    requestId: crypto.randomUUID(), expectedPrice: box.marketPrice?.currentPrice ?? '',
+    requestId: crypto.randomUUID(), expectedPrice: box.customPrice ?? box.marketPrice?.currentPrice ?? '',
   };
   if (!isCreditAmount(pending.expectedPrice) || !pending.requestId) throw new ApiError(409, 'Preço da caixa indisponível. Atualize a página.');
   localStorage.setItem(key, JSON.stringify(pending));
@@ -55,7 +57,7 @@ async function normalizeOpeningResponse(data: OpeningResponse, box: CatalogCase,
   const winner = data.item;
   const match = (catalog: CatalogCase) => (winner.special ? catalog.specialItems : catalog.items)
     .find(item => item.id === winner.externalId && (!item.rarityData || item.rarityData.id === winner.rarity.id));
-  const catalogItem = match(box) ?? match(await getOfficialCase(box.id));
+  const catalogItem = match(box) ?? match(await getCatalogCase(box.id));
   if (!catalogItem) throw invalidResult();
   return {
     skinId: winner.skinId, special: winner.special, variant: data.variant,
@@ -93,7 +95,7 @@ export async function requestOpeningBatch(box: CatalogCase, expectedUserId: numb
   const key = `csbet:pending-batch:${expectedUserId}:${box.id}`;
   const stored = localStorage.getItem(key);
   const pending: { requestId: string; expectedPrice: string; quantity: number } = stored ? JSON.parse(stored) : {
-    requestId: crypto.randomUUID(), expectedPrice: box.marketPrice?.currentPrice ?? '', quantity,
+    requestId: crypto.randomUUID(), expectedPrice: box.customPrice ?? box.marketPrice?.currentPrice ?? '', quantity,
   };
   if (pending.quantity !== quantity || !isCreditAmount(pending.expectedPrice)) throw invalidResult();
   localStorage.setItem(key, JSON.stringify(pending));

@@ -35,7 +35,7 @@ export function CatalogHeroShowcase({ items, custom, loading = false }: {
           <span className="showcase-corner corner-end" aria-hidden="true" />
           <CatalogImage key={featured.id} src={featured.image} alt={featured.name} remote={!custom} />
         </div>
-        <div className="hero-image-caption"><span>{featured.name}</span><small>{custom ? 'COLEÇÃO DEMONSTRATIVA' : 'COUNTER-STRIKE 2'}</small></div>
+        <div className="hero-image-caption"><span>{featured.name}</span><small>{custom ? 'CAIXA PERSONALIZADA · CS BET' : 'COUNTER-STRIKE 2'}</small></div>
         {previewItems.length > 1 && <div className="showcase-preview-strip" style={{ gridTemplateColumns: `repeat(${previewItems.length}, minmax(0, 1fr))` }} aria-hidden="true">
           {previewItems.map(item => <div key={item.id} className={`showcase-preview${item.id === featured.id ? ' is-current' : ''}`}>
             <CatalogImage src={item.image} alt="" remote={!custom} /><span>{item.name}</span>

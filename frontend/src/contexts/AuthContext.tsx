@@ -28,6 +28,8 @@ interface AuthValue {
   isLoading: boolean;
   notice: string;
   inventoryEstimate: string | null | undefined;
+  inventoryLoading: boolean;
+  inventoryError: boolean;
   login: (data: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -51,6 +53,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [inventoryEstimate, setInventoryEstimate] = useState<
     string | null | undefined
   >(undefined);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
+  const [inventoryError, setInventoryError] = useState(false);
+  const inventoryRevision = useRef(0);
   const revision = useRef(0);
 
   const logout = useCallback(async () => {
@@ -117,6 +122,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [session, expire]);
 
+  const token = session?.token;
+  const expiresAt = session?.expiresAt;
+  const ownerId = session?.user.id;
+
+  useEffect(() => {
+    if (!token || !expiresAt || isLoading) return;
+    let active = true;
+    const attempt = revision.current;
+    const request = ++inventoryRevision.current;
+    setInventoryEstimate(undefined);
+    setInventoryLoading(true);
+    setInventoryError(false);
+    void fetchInventory(token, 0).then(data => {
+      if (active && attempt === revision.current && request === inventoryRevision.current) {
+        setInventoryEstimate(data.estimatedAvailableTotal);
+        setInventoryLoading(false);
+      }
+    }).catch(error => {
+      if (!active || attempt !== revision.current || request !== inventoryRevision.current) return;
+      setInventoryLoading(false);
+      if (error instanceof ApiError && error.status === 401) expire();
+      else setInventoryError(true);
+    });
+    return () => { active = false; };
+  }, [token, expiresAt, ownerId, isLoading, expire]);
+
   const getInventory = useCallback(
     async (page: number, status?: InventoryStatus, sort?: InventorySort) => {
       if (!session || Date.now() >= session.expiresAt) {
@@ -127,13 +158,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
       }
       const attempt = revision.current;
+      const request = ++inventoryRevision.current;
       try {
         const data = await fetchInventory(session.token, page, status, sort);
         if (attempt !== revision.current)
           throw new ApiError(401, 'A sessão foi encerrada.');
-        setInventoryEstimate(data.estimatedAvailableTotal);
+        if (request === inventoryRevision.current) {
+          setInventoryEstimate(data.estimatedAvailableTotal);
+          setInventoryLoading(false);
+          setInventoryError(false);
+        }
         return data;
       } catch (error) {
+        if (attempt === revision.current && request === inventoryRevision.current) {
+          setInventoryLoading(false);
+          setInventoryError(true);
+        }
         if (
           attempt === revision.current &&
           error instanceof ApiError &&
@@ -146,8 +186,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [session, expire],
   );
 
-  const token = session?.token;
-  const expiresAt = session?.expiresAt;
   const walletCall = useCallback(async <T,>(action: (token: string) => Promise<T>): Promise<T> => {
     if (!token || !expiresAt || Date.now() >= expiresAt) {
       expire();
@@ -179,6 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const attempt = ++revision.current;
     setIsLoading(true);
     setNotice('');
+    setInventoryEstimate(undefined);
     try {
       const result = await api.login(data);
       const expiresAt = Date.now() + result.expiresIn * 1000;
@@ -222,6 +261,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         notice,
         inventoryEstimate,
+        inventoryLoading: !!session && inventoryLoading,
+        inventoryError: !!session && inventoryError,
         login,
         logout,
         refreshUser,

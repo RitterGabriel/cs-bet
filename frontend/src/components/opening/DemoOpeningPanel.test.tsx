@@ -255,4 +255,16 @@ describe('fluxo completo da abertura com créditos fictícios', () => {
     expect(ids()).toEqual(before); expect(postCount()).toBe(0);
   });
 
+  it('abre personalizada pelo preço próprio, sem cotação de caixa oficial', async () => {
+    reduced = true;
+    const custom = { ...openingBox, id: 'custom-fixture', category: 'custom' as const, isReal: false, marketPrice: undefined,
+      customReady: true, customPrice: '3.00', items: [{ ...openingSkin, customChance: '99.00' }], specialItems: [{ ...openingSpecial, customChance: '1.00' }] };
+    postResponse = async () => Response.json({ ...openingResponse(), caseId: 'custom-fixture', charged: '3.00' });
+    await mount(custom);expect(button('Abrir caixa').props.disabled).toBe(false);
+    await click('Abrir caixa');expect(postCount()).toBe(1);
+    const post = fetchMock.mock.calls.find(call => call[0] === '/api/openings')!;
+    expect(JSON.parse(post[1].body).expectedPrice).toBe('3.00');
+    expect(renderer!.root.findAllByProps({ 'aria-label': 'Skin recebida' })).toHaveLength(1);
+  });
+
 });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import {
   ArrowUpRight,
@@ -13,13 +13,12 @@ import {
   SlidersHorizontal,
   Sparkles,
 } from 'lucide-react';
-import { listOfficialCases } from '../services/catalog';
+import { listOfficialCases, listCustomCases } from '../services/catalog';
 import type { CatalogPageResponse } from '../services/catalog';
 import { ApiError } from '../services/api';
 import { MarketPriceNotice } from '../components/MarketPriceNotice';
 import { CaseCard } from '../components/CaseCard';
 import { CatalogHeroShowcase } from '../components/CatalogHeroShowcase';
-import { cases } from '../data/cases';
 import type { CaseCategory } from '../types/catalog';
 
 export function CatalogPage({
@@ -32,7 +31,7 @@ export function CatalogPage({
   const custom = category === 'custom';
   const [page, setPage] = useState(0);
   const [retry, setRetry] = useState(0);
-  const [loading, setLoading] = useState(!custom);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [remote, setRemote] = useState<CatalogPageResponse>({
     content: [],
@@ -44,12 +43,11 @@ export function CatalogPage({
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('featured');
   useEffect(() => {
-    if (custom) return;
     let active = true;
     setLoading(true);
     setError('');
     const timer = window.setTimeout(() => {
-      listOfficialCases(page, query, sort)
+      (custom ? listCustomCases : listOfficialCases)(page, query, sort)
         .then((result) => {
           if (active) setRemote(result);
         })
@@ -70,21 +68,7 @@ export function CatalogPage({
       window.clearTimeout(timer);
     };
   }, [custom, page, query, sort, retry]);
-  const visibleCases = useMemo(() => {
-    if (!custom) return remote.content;
-    const result = cases.filter(
-      (item) =>
-        item.category === category &&
-        item.name
-          .toLocaleLowerCase('pt-BR')
-          .includes(query.toLocaleLowerCase('pt-BR').trim()),
-    );
-    return sort === 'name'
-      ? result.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
-      : sort === 'name_desc'
-        ? result.sort((a, b) => b.name.localeCompare(a.name, 'pt-BR'))
-        : result;
-  }, [category, custom, query, sort, remote]);
+  const visibleCases = remote.content;
   return (
     <div className="catalog-experience">
       <section className={`hero ${custom ? 'hero-custom' : ''}`}>
@@ -113,12 +97,12 @@ export function CatalogPage({
             </h1>
             <p>
               {custom
-                ? 'Coleções temáticas com a identidade CS Bet. Novas combinações para conhecer e imaginar.'
+                ? 'Caixas criadas pelo CS Bet: de seleções econômicas a facas e luvas. Conteúdo, variantes e chances publicados.'
                 : 'Caixas icônicas e skins marcantes. Descubra os detalhes que tornam cada coleção única.'}
             </p>
             <div className="hero-actions">
               <a className="button primary" href="#catalog">
-                Explorar {custom ? 'coleções' : 'caixas'} <ArrowUpRight size={18} />
+                Explorar caixas <ArrowUpRight size={18} />
               </a>
               <Link className="text-link" to="/statistics">
                 <BarChartIcon /> Meu histórico
@@ -137,9 +121,9 @@ export function CatalogPage({
             </div>
           </div>
           <CatalogHeroShowcase
-            items={!custom && (loading || error) ? [] : visibleCases}
+            items={(loading || error) ? [] : visibleCases}
             custom={custom}
-            loading={!custom && loading}
+            loading={loading}
           />
         </div>
       </section>
@@ -156,11 +140,9 @@ export function CatalogPage({
                 : 'ESCOLHA. CONHEÇA. EXPLORE.'}
             </span>
             <h2 id="catalog-title">
-              {custom ? 'Coleções personalizadas' : 'Caixas oficiais'}{' '}
+              {custom ? 'Caixas personalizadas' : 'Caixas oficiais'}{' '}
               <span className="count-tag">
-                {custom
-                  ? cases.filter((item) => item.category === 'custom').length
-                  : loading ? '—' : remote.totalElements}
+                {loading ? '—' : remote.totalElements}
               </span>
             </h2>
             <p>
@@ -171,7 +153,7 @@ export function CatalogPage({
           </div>
           <span className="section-label">
             <span className="tiny-diamond" />{' '}
-            {custom ? 'CATÁLOGO DEMONSTRATIVO' : 'CATÁLOGO COUNTER-STRIKE 2'}
+            {custom ? 'CHANCES PRÓPRIAS · CRÉDITOS FICTÍCIOS' : 'CATÁLOGO COUNTER-STRIKE 2'}
           </span>
         </div>
         {!custom && <details className="catalog-pricing-note">
@@ -181,7 +163,7 @@ export function CatalogPage({
         <div className="catalog-toolbar">
           <div className="toolbar-label">
             {custom ? <Layers3 size={18} /> : <Box size={18} />}{' '}
-            {custom ? 'Todas as coleções' : 'Todas as caixas'}
+            {custom ? 'Caixas personalizadas' : 'Todas as caixas'}
             <span>{visibleCases.length}</span>
           </div>
           <div className="catalog-controls">
@@ -212,12 +194,8 @@ export function CatalogPage({
                 <option value="featured">Em destaque</option>
                 <option value="name">Nome A–Z</option>
                 <option value="name_desc">Nome Z–A</option>
-                {!custom && (
-                  <>
-                    <option value="price_desc">Maior preço</option>
-                    <option value="price_asc">Menor preço</option>
-                  </>
-                )}
+                <option value="price_desc">Maior preço</option>
+                <option value="price_asc">Menor preço</option>
               </select>
             </label>
           </div>
@@ -228,12 +206,12 @@ export function CatalogPage({
             ? 'resultado encontrado'
             : 'resultados encontrados'}
         </p>
-        {!custom && loading ? (
+        {loading ? (
           <div className="catalog-loading" role="status">
             <span className="sr-only">Carregando catálogo...</span>
             <div className="case-grid" aria-hidden="true">{Array.from({ length: 8 }, (_, index) => <div className="catalog-card-skeleton" key={index}><div /><span /><span /></div>)}</div>
           </div>
-        ) : !custom && error ? (
+        ) : error ? (
           <div className="empty-state" role="alert">
             <h3>Não foi possível carregar o catálogo</h3>
             <p>{error}</p>
@@ -264,7 +242,7 @@ export function CatalogPage({
             </button>
           </div>
         )}
-        {!custom && !loading && !error && remote.totalPages > 1 && (
+        {!loading && !error && remote.totalPages > 1 && (
           <nav className="pagination" aria-label="Paginação do catálogo">
             <button
               className="button secondary"

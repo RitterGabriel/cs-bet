@@ -29,6 +29,6 @@ export function ProbabilityEducation() {
         <div className="concept-note"><ShieldCheck size={20} /><span>Entender o modelo evita interpretações equivocadas.</span></div>
       </article>
     </div>
-    <div className="info-box statistics-info"><ShieldCheck size={22} /><p>Nas caixas verificadas, a chance do grupo especial segue a publicação oficial. A conversão do dourado em um item especial usa seleção uniforme própria do CS Bet, com chances iguais entre as opções especiais da caixa. Desgaste e StatTrak seguem uma regra interna de simulação, sem representar distribuições oficiais de variantes.</p></div>
+    <div className="info-box statistics-info"><ShieldCheck size={22} /><p>Nas caixas oficiais verificadas, a chance do grupo especial segue a publicação oficial. A conversão do dourado em um item especial usa seleção uniforme própria do CS Bet, com chances iguais entre as opções especiais da caixa. Desgaste e StatTrak seguem uma regra interna de simulação, sem representar distribuições oficiais de variantes. Nas caixas personalizadas, valem as chances próprias publicadas em cada caixa.</p></div>
   </section>;
 }

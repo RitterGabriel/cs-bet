@@ -65,4 +65,15 @@ describe('conteúdo da caixa com grupo especial', () => {
     expect(html).not.toContain('gold-special-card');
     expect(html.match(/class="skin-market-card/g)).toHaveLength(1);
   });
+  it('personalizada exibe cada resultado e suas chances próprias, inclusive a faca', () => {
+    const custom = { ...box, id: 'custom-all-win', name: 'All Win', category: 'custom' as const, isReal: false,
+      customPrice: '3.00', customReady: true, specialReward: null,
+      items: [{ ...normal, customChance: '99.00' }], specialItems: [{ ...box.specialItems[0], customChance: '1.00' }] };
+    const html = renderToStaticMarkup(<MemoryRouter><AuthProvider><CaseDetailsContent item={custom} /></AuthProvider></MemoryRouter>);
+    expect(html.match(/class="skin-market-card/g)).toHaveLength(2);
+    expect(html).not.toContain('gold-special-card');expect(html).toContain('Faca interna 0');
+    expect(html).toContain('99% · CS BET');expect(html).toContain('1% · CS BET');
+    expect(html).toContain('3,00');expect(html).not.toContain('regras oficiais da Perfect World');
+  });
+
 });

@@ -4,7 +4,8 @@ import { Box, ChevronRight, Info, Layers3 } from "lucide-react";
 import type { CSSProperties } from "react";
 import type { CatalogCase } from "../types/catalog";
 import { cases, categoryLabels } from "../data/cases";
-import { getOfficialCase } from "../services/catalog";
+import { getCatalogCase } from "../services/catalog";
+import { formatBRL } from '../services/market';
 import { ApiError } from "../services/api";
 import { CatalogImage } from "../components/CatalogImage";
 import { MarketPriceNotice } from "../components/MarketPriceNotice";
@@ -31,7 +32,7 @@ export function CaseDetailsPage() {
     setLoading(true);
     setError("");
     setNotFound(false);
-    getOfficialCase(id)
+    getCatalogCase(id)
       .then((item) => {
         if (active) setRemote(item);
       })
@@ -87,8 +88,10 @@ export function CaseDetailsPage() {
 }
 
 export function CaseDetailsContent({ item }: { item: CatalogCase }) {
+  const customized = item.category === 'custom' && item.customReady !== undefined;
+  const playable = item.isReal || customized;
   const skins = [
-    ...new Map(item.items.map((entry) => [entry.id, entry])).values(),
+    ...new Map((customized ? [...item.items, ...item.specialItems] : item.items).map((entry) => [entry.id, entry])).values(),
   ];
   return (
     <div className="container page-content">
@@ -100,7 +103,7 @@ export function CaseDetailsContent({ item }: { item: CatalogCase }) {
         <span>{item.name}</span>
       </nav>
       <section
-        className={`case-detail-hero${item.isReal ? " case-opening-hero" : ""}`}
+        className={`case-detail-hero${playable ? " case-opening-hero" : ""}`}
         style={{ "--case-accent": item.accent } as CSSProperties}
       >
         <div className="detail-art">
@@ -121,6 +124,7 @@ export function CaseDetailsContent({ item }: { item: CatalogCase }) {
             {categoryLabels[item.category]}
           </span>
           <h1>{item.name}</h1>
+          {customized && item.customPrice && <div className="custom-opening-price"><span>Créditos fictícios por caixa</span><strong>{formatBRL(item.customPrice)}</strong></div>}
           {item.isReal && (
             <MarketPricePanel
               itemType="case"
@@ -140,14 +144,14 @@ export function CaseDetailsContent({ item }: { item: CatalogCase }) {
           <div className="info-box">
             <Info size={20} />
             <p>
-              {item.isReal
+              {playable
                 ? "Abra com créditos fictícios e receba uma skin virtual no seu inventário."
                 : "Coleção fictícia para consulta. Os itens ainda estão em preparação."}
             </p>
           </div>
         </div>
       </section>
-      {item.isReal && <DemoOpeningPanel key={item.id} box={item} />}
+      {playable && <DemoOpeningPanel key={item.id} box={item} />}
       {item.isReal && (
         <MarketPriceNotice
           quotes={[
@@ -158,13 +162,14 @@ export function CaseDetailsContent({ item }: { item: CatalogCase }) {
           ]}
         />
       )}
+      {customized && <div className="info-box custom-case-notice"><Info size={20} /><p>{item.description} {item.specialNotice} As cotações dos itens são referências de mercado e podem variar; o preço da caixa é definido em créditos fictícios.</p></div>}
       <section className="panel" aria-labelledby="contents-title">
         <div className="panel-title">
           <Box size={21} />
           <h2 id="contents-title">Conteúdo da caixa</h2>
           <span className="mini-tag">
             {skins.length || item.specialItems.length
-              ? `${skins.length} skins${item.specialItems.length ? " + 1 item especial" : ""}`
+              ? `${skins.length} skins${!customized && item.specialItems.length ? " + 1 item especial" : ""}`
               : "Em preparação"}
           </span>
         </div>
@@ -184,7 +189,7 @@ export function CaseDetailsContent({ item }: { item: CatalogCase }) {
             items={skins}
             showDropChance={item.isReal}
             specialReward={
-              item.specialItems.length > 0 ? (
+              !customized && item.specialItems.length > 0 ? (
                 <GoldSpecialCard reward={item.specialReward} items={item.specialItems} caseName={item.name} />
               ) : undefined
             }
@@ -207,10 +212,10 @@ export function CaseDetailsContent({ item }: { item: CatalogCase }) {
           <h2>Raridade não é probabilidade</h2>
         </div>
         <p className="muted">
-          As cores identificam as categorias informadas pela fonte. A borda e a
+          {customized ? 'As cores identificam a raridade dos itens, mas as chances desta caixa são definidas pelo CS Bet e publicadas por skin. A sequência da roleta é visual e não altera essas chances. Não há garantia de que a skin recebida tenha valor acima do custo da abertura.' : <>As cores identificam as categorias informadas pela fonte. A borda e a
           etiqueta de cada item preservam sua raridade original. As chances
           exibidas são aproximações calculadas conforme a fonte oficial, não
-          garantias de resultado.
+          garantias de resultado.</>}
         </p>
         <Link className="text-link" to="/statistics">
           Conheça os conceitos estatísticos

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Order(-1)
-@RestControllerAdvice(assignableTypes = CaseController.class)
+@RestControllerAdvice(assignableTypes = {CaseController.class, CustomCaseController.class})
 public class CatalogExceptionHandler {
     @ExceptionHandler(CatalogNotFoundException.class)
     ResponseEntity<ApiError> notFound() { return ResponseEntity.status(404).body(new ApiError("Caixa não encontrada.")); }

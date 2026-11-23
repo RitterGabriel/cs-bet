@@ -31,7 +31,7 @@ export function SkinCard({
         onClick={onOpen}
         aria-label={`Ver detalhes de ${item.name}`}
       >
-        {showDropChance && (
+        {item.customChance ? <span className="skin-drop-chance" title="Chance própria desta caixa CS Bet; inclui apenas as variantes exibidas.">{new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(Number(item.customChance))}% · CS BET</span> : showDropChance && (
           <span
             className="skin-drop-chance"
             title={

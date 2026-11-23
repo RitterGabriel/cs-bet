@@ -16,6 +16,7 @@ export type Rarity =
 
 export interface CaseItem {
   decorativeSpecial?: boolean;
+  customChance?: string;
   id: string;
   name: string;
   image: string;
@@ -46,6 +47,8 @@ export interface CatalogCase {
   isReal?: boolean;
   simulatedItemPrices?: PriceRange | null;
   marketPrice?: MarketQuote;
+  customPrice?: string;
+  customReady?: boolean;
   descriptionFromSource?: boolean;
   language?: string;
   source?: string;

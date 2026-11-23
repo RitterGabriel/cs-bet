@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react';
 import type { CatalogCase } from '../types/catalog';
 import { CatalogImage } from './CatalogImage';
 import { MarketPriceLabel } from './MarketPricePanel';
-import { quoteAvailable, unavailableQuote } from '../services/market';
+import { quoteAvailable, unavailableQuote, formatBRL } from '../services/market';
 import { categoryLabels } from '../data/cases';
 
 export function CaseCard({ item }: { item: CatalogCase }) {
@@ -26,7 +26,7 @@ export function CaseCard({ item }: { item: CatalogCase }) {
           <div className="case-card-bottom">
             {item.isReal ? <div className={`case-reference-price${priced ? '' : ' price-unavailable'}`}>
               <small>Referência de mercado</small><MarketPriceLabel quote={item.marketPrice} />
-            </div> : <span className="case-concept-label">Coleção demonstrativa</span>}
+            </div> : item.customPrice ? <div className="case-reference-price custom-case-price"><small>Créditos fictícios por caixa</small><strong>{formatBRL(item.customPrice)}</strong>{item.customReady === false && <small>Indisponível</small>}</div> : <span className="case-concept-label">Coleção demonstrativa</span>}
             <span className="case-cta" aria-hidden="true"><ArrowUpRight size={18} /></span>
           </div>
         </div>

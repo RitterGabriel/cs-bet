@@ -25,6 +25,9 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(properties = {"csbet.pricing.schedule-enabled=false", "csbet.market.enabled=false"})
 class CaseOpeningOracleTest {
     @Autowired CaseOpeningService service;
+    @Autowired CustomCaseRepository customDefinitions;
+    @Autowired CustomCaseEntryRepository customEntries;
+    Long customBoxId;
     @Autowired com.csbet.backend.inventory.InventoryRepository inventory;
     @Autowired com.csbet.backend.inventory.InventoryService ownedInventory;
     @Autowired OpeningBatchService batchService;
@@ -273,6 +276,24 @@ class CaseOpeningOracleTest {
         var sold=ownedInventory.findOwned(ownerId,0,12,com.csbet.backend.inventory.InventoryStatus.SOLD,com.csbet.backend.inventory.InventorySort.PRICE_DESC);
         assertThat(sold.totalElements()).isEqualTo(1);assertThat(sold.content().getFirst().id()).isEqualTo(ids.get(Wear.MW));
     }
+
+    @Test void customOpeningUsesPublishedPriceAndRestrictedVariantsWithoutOfficialSimulation() {
+        var box=new WeaponCase("CSBET","custom-test-"+UUID.randomUUID());box.updateCustom("Custom test","Test","/images/test.svg","TEST_CUSTOM_V1");
+        box=cases.saveAndFlush(box);customBoxId=box.getId();
+        var definition=customDefinitions.saveAndFlush(new CustomCaseDefinition(box,new BigDecimal("1.00"),"#00d4ff","TEST_CUSTOM_V1","0".repeat(64)));
+        var skin=skins.findById(skinId).orElseThrow();var variant=variants.findBySkinIdIn(List.of(skinId)).getFirst();
+        customEntries.saveAndFlush(new CustomCaseEntry(definition,skin,10000,List.of(variant)));
+        String externalId=box.getExternalId();
+        var request=new OpeningBatchRequest(externalId,UUID.randomUUID(),new BigDecimal("1.00"),2);
+        var opened=batchService.open(ownerId,request);assertThat(opened.results()).hasSize(2);
+        assertThat(opened.charged()).isEqualByComparingTo("2.00");assertThat(opened.balance()).isEqualByComparingTo("1.00");
+        assertThat(opened.results()).allSatisfy(r->{assertThat(r.item().externalId()).isEqualTo(skin.getExternalId());assertThat(r.variant().wear()).isEqualTo(Wear.FT);});
+        assertThat(batchService.open(ownerId,request)).isEqualTo(opened);counts(2);verifyNoInteractions(simulation);
+        jdbc.update("UPDATE CSBET_CUSTOM_ENTRIES SET WEIGHT=9999 WHERE CASE_ID=?",customBoxId);
+        assertThatThrownBy(()->service.open(ownerId,new OpeningRequest(externalId,UUID.randomUUID(),new BigDecimal("1.00"))))
+            .isInstanceOf(CustomCaseUnavailableException.class);
+        assertThat(users.findById(ownerId).orElseThrow().getBalance()).isEqualByComparingTo("1.00");counts(2);
+    }
     @AfterEach void cleanup() {
         for (Long id : Arrays.asList(ownerId, otherId)) if (id != null) {
             jdbc.update("DELETE FROM CSBET_SALE_BATCHES WHERE USER_ID=?", id);
@@ -282,6 +303,11 @@ class CaseOpeningOracleTest {
             jdbc.update("DELETE FROM CSBET_INVENTORY_ITEMS WHERE OWNER_ID=?", id);
             jdbc.update("DELETE FROM CSBET_WALLET_MOVEMENTS WHERE USER_ID=?", id);
             users.deleteById(id);
+        }
+        if(customBoxId!=null) {
+            jdbc.update("DELETE FROM CSBET_CUSTOM_VARIANTS WHERE ENTRY_ID IN (SELECT ID FROM CSBET_CUSTOM_ENTRIES WHERE CASE_ID=?)",customBoxId);
+            jdbc.update("DELETE FROM CSBET_CUSTOM_ENTRIES WHERE CASE_ID=?",customBoxId);
+            jdbc.update("DELETE FROM CSBET_CUSTOM_CASES WHERE CASE_ID=?",customBoxId);cases.deleteById(customBoxId);
         }
         if (skinId != null) { jdbc.update("DELETE FROM CSBET_MARKET_VARIANTS WHERE SKIN_ID=?", skinId); skins.deleteById(skinId); }
         if (boxId != null) { jdbc.update("DELETE FROM CSBET_MARKET_VARIANTS WHERE CASE_ID=?", boxId); cases.deleteById(boxId); }

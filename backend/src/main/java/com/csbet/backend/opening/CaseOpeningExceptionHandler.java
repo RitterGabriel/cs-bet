@@ -18,10 +18,10 @@ public class CaseOpeningExceptionHandler {
         return ResponseEntity.badRequest().body(new ApiError("Informe uma caixa, um identificador UUID e o preço esperado com até duas casas decimais."));
     }
     public record OpeningError(String message, String code) { }
-    @ExceptionHandler({OpeningUnavailableException.class, org.springframework.dao.ConcurrencyFailureException.class})
+    @ExceptionHandler({OpeningUnavailableException.class, com.csbet.backend.casecatalog.CustomCaseUnavailableException.class, org.springframework.dao.ConcurrencyFailureException.class})
     ResponseEntity<OpeningError> conflict(Exception failure) {
-        return ResponseEntity.status(409).body(new OpeningError(failure instanceof OpeningUnavailableException
+        return ResponseEntity.status(409).body(new OpeningError((failure instanceof OpeningUnavailableException || failure instanceof com.csbet.backend.casecatalog.CustomCaseUnavailableException)
                 ? failure.getMessage() : "Carteira ocupada. Repita a tentativa com o mesmo identificador.",
-                failure instanceof OpeningUnavailableException ? "OPENING_REJECTED" : "OPENING_BUSY"));
+                (failure instanceof OpeningUnavailableException || failure instanceof com.csbet.backend.casecatalog.CustomCaseUnavailableException) ? "OPENING_REJECTED" : "OPENING_BUSY"));
     }
 }

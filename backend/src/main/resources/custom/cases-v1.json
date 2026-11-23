@@ -1,0 +1,1262 @@
+{
+  "version": "CSBET_CUSTOM_V1",
+  "boxes": [
+    {
+      "id": "custom-eco-rush",
+      "name": "Eco Rush",
+      "price": "1.50",
+      "accent": "#36d399",
+      "description": "Uma seleção econômica, com skins básicas e uma pequena chance de melhorar o equipamento.",
+      "image": "/images/custom-eco-rush.svg",
+      "entries": [
+        {
+          "externalId": "skin-543d85d8ca60",
+          "name": "MAC-10 | Light Box",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "WW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-806137e84f73",
+          "name": "UMP-45 | Motorized",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-db200bb3a1ef",
+          "name": "P250 | Re.built",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "WW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-038541568496",
+          "name": "MP9 | Nexus",
+          "weight": 1800,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "BS",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-f3392bb443bc",
+          "name": "USP-S | Ticket to Hell",
+          "weight": 600,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-2a0e222beb58",
+          "name": "Desert Eagle | Light Rail",
+          "weight": 100,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-all-win",
+      "name": "All Win",
+      "price": "3.00",
+      "accent": "#f5bf4f",
+      "description": "99% para MP9 | Nexus e 1% para Navaja Knife. O nome é temático e não garante retorno em créditos.",
+      "image": "/images/custom-all-win.svg",
+      "entries": [
+        {
+          "externalId": "skin-038541568496",
+          "name": "MP9 | Nexus",
+          "weight": 9900,
+          "variants": [
+            {
+              "wear": "WW",
+              "statTrak": false
+            },
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_gypsy_jackknife",
+          "name": "★ Navaja Knife",
+          "weight": 100,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-pistol-round",
+      "name": "Pistol Round",
+      "price": "6.90",
+      "accent": "#8eb8ff",
+      "description": "Glocks, USP-S e Desert Eagles, das opções econômicas aos acabamentos mais valorizados.",
+      "image": "/images/custom-pistol-round.svg",
+      "entries": [
+        {
+          "externalId": "skin-2a4119de0db9",
+          "name": "Glock-18 | Winterized",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "BS",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-7698ea25d00a",
+          "name": "Desert Eagle | Bronze Deco",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-f3392bb443bc",
+          "name": "USP-S | Ticket to Hell",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-2a0e222beb58",
+          "name": "Desert Eagle | Light Rail",
+          "weight": 1500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-6e390882e9a0",
+          "name": "Glock-18 | Vogue",
+          "weight": 800,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-a79b5b4ad623",
+          "name": "Desert Eagle | Mecha Industries",
+          "weight": 200,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-ak-arsenal",
+      "name": "AK Arsenal",
+      "price": "24.90",
+      "accent": "#fb8c66",
+      "description": "Uma seleção dedicada à AK-47, com variantes escolhidas para esta faixa de referências.",
+      "image": "/images/custom-ak-arsenal.svg",
+      "entries": [
+        {
+          "externalId": "skin-9a7c16468868",
+          "name": "AK-47 | Uncharted",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-ea4e27f0cd16",
+          "name": "AK-47 | Elite Build",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "BS",
+              "statTrak": false
+            },
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-48e1c7c5df5e",
+          "name": "AK-47 | Slate",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-4c2e3face5fd",
+          "name": "AK-47 | Searing Rage",
+          "weight": 1500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-91a429af4a60",
+          "name": "AK-47 | Redline",
+          "weight": 500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-awp-scope",
+      "name": "AWP Scope",
+      "price": "29.90",
+      "accent": "#6aa9ff",
+      "description": "AWPs acessíveis e opções menos frequentes de maior valor, com chances individuais publicadas.",
+      "image": "/images/custom-awp-scope.svg",
+      "entries": [
+        {
+          "externalId": "skin-29f83d73bb6a",
+          "name": "AWP | Capillary",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-860a0652d07a",
+          "name": "AWP | PAW",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-d6cf8565026b",
+          "name": "AWP | Atheris",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "BS",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-c41637779316",
+          "name": "AWP | Mortis",
+          "weight": 1500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-d85f6159fe4a",
+          "name": "AWP | Fever Dream",
+          "weight": 800,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-7b1ef066823d",
+          "name": "AWP | Neo-Noir",
+          "weight": 200,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-stattrak-lab",
+      "name": "StatTrak Lab",
+      "price": "29.90",
+      "accent": "#4de4c1",
+      "description": "Somente variantes StatTrak das skins exibidas, com referências econômicas e intermediárias.",
+      "image": "/images/custom-stattrak-lab.svg",
+      "entries": [
+        {
+          "externalId": "skin-f3392bb443bc",
+          "name": "USP-S | Ticket to Hell",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": true
+            }
+          ]
+        },
+        {
+          "externalId": "skin-2a0e222beb58",
+          "name": "Desert Eagle | Light Rail",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": true
+            }
+          ]
+        },
+        {
+          "externalId": "skin-ea4e27f0cd16",
+          "name": "AK-47 | Elite Build",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": true
+            }
+          ]
+        },
+        {
+          "externalId": "skin-860a0652d07a",
+          "name": "AWP | PAW",
+          "weight": 1500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": true
+            }
+          ]
+        },
+        {
+          "externalId": "skin-d6cf8565026b",
+          "name": "AWP | Atheris",
+          "weight": 500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-neon-vibes",
+      "name": "Neon Vibes",
+      "price": "39.90",
+      "accent": "#dc62ff",
+      "description": "Cores fortes, com Neon Rider e Neon Revolution entre os resultados menos frequentes.",
+      "image": "/images/custom-neon-vibes.svg",
+      "entries": [
+        {
+          "externalId": "skin-a16b386af5bb",
+          "name": "MP7 | Neon Ply",
+          "weight": 3500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-6e390882e9a0",
+          "name": "Glock-18 | Vogue",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-6d14d557c648",
+          "name": "MP9 | Food Chain",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "BS",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-f10cd3871578",
+          "name": "AK-47 | Ice Coaled",
+          "weight": 1500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-74e670c4b279",
+          "name": "AK-47 | Neon Rider",
+          "weight": 400,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-1a5e885d9d28",
+          "name": "AK-47 | Neon Revolution",
+          "weight": 100,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-knife-hunt",
+      "name": "Knife Hunt",
+      "price": "39.90",
+      "accent": "#e4b34a",
+      "description": "80% para MP9 | Nexus, 10% para AK-47 | Slate e 10% distribuídos entre quatro facas.",
+      "image": "/images/custom-knife-hunt.svg",
+      "entries": [
+        {
+          "externalId": "skin-038541568496",
+          "name": "MP9 | Nexus",
+          "weight": 8000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-48e1c7c5df5e",
+          "name": "AK-47 | Slate",
+          "weight": 1000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_gypsy_jackknife",
+          "name": "★ Navaja Knife",
+          "weight": 400,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_gut",
+          "name": "★ Gut Knife",
+          "weight": 300,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_push",
+          "name": "★ Shadow Daggers",
+          "weight": 200,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_outdoor",
+          "name": "★ Nomad Knife",
+          "weight": 100,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-print-lab",
+      "name": "Print Lab",
+      "price": "54.90",
+      "accent": "#f1f5f9",
+      "description": "Desert Eagles: Light Rail, Mecha Industries e 20% para Printstream.",
+      "image": "/images/custom-print-lab.svg",
+      "entries": [
+        {
+          "externalId": "skin-2a0e222beb58",
+          "name": "Desert Eagle | Light Rail",
+          "weight": 6000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-a79b5b4ad623",
+          "name": "Desert Eagle | Mecha Industries",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-32a30647e564",
+          "name": "Desert Eagle | Printstream",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-red-collection",
+      "name": "Red Collection",
+      "price": "199.90",
+      "accent": "#f05c71",
+      "description": "Somente skins Covert, com referências próximas à faixa da caixa e resultados menos frequentes acima dela.",
+      "image": "/images/custom-red-collection.svg",
+      "entries": [
+        {
+          "externalId": "skin-dfd42a079f44",
+          "name": "AK-47 | Legion of Anubis",
+          "weight": 4000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-3a4cc2c7a86f",
+          "name": "AWP | Chromatic Aberration",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-e8144faeae9f",
+          "name": "M4A4 | Neo-Noir",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-09205674e246",
+          "name": "AK-47 | Asiimov",
+          "weight": 900,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-1a5e885d9d28",
+          "name": "AK-47 | Neon Revolution",
+          "weight": 100,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-glove-lab",
+      "name": "Glove Lab",
+      "price": "249.90",
+      "accent": "#c69bff",
+      "description": "Somente luvas, em variantes selecionadas. Não há StatTrak em luvas.",
+      "image": "/images/custom-glove-lab.svg",
+      "entries": [
+        {
+          "externalId": "skin-5e8f5f1fecb1",
+          "name": "★ Driver Gloves | Racing Green",
+          "weight": 4000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-b6c2f9e4afaa",
+          "name": "★ Specialist Gloves | Buckshot",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-03513562b183",
+          "name": "★ Hand Wraps | Duct Tape",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-24bd5ece81d7",
+          "name": "★ Sport Gloves | Bronze Morph",
+          "weight": 1000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-blade-club",
+      "name": "Blade Club",
+      "price": "399.90",
+      "accent": "#f1b541",
+      "description": "Uma faca em toda abertura, entre os modelos desta seleção. Isso não garante que seu valor supere o custo da caixa.",
+      "image": "/images/custom-blade-club.svg",
+      "entries": [
+        {
+          "externalId": "skin-vanilla-weapon_knife_gypsy_jackknife",
+          "name": "★ Navaja Knife",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_canis",
+          "name": "★ Survival Knife",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_gut",
+          "name": "★ Gut Knife",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_push",
+          "name": "★ Shadow Daggers",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_survival_bowie",
+          "name": "★ Bowie Knife",
+          "weight": 1000,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_tactical",
+          "name": "★ Huntsman Knife",
+          "weight": 800,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-vanilla-weapon_knife_outdoor",
+          "name": "★ Nomad Knife",
+          "weight": 200,
+          "variants": [
+            {
+              "wear": "NONE",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-cyan-luxury",
+      "name": "Cyan Luxury",
+      "price": "849.90",
+      "accent": "#00d4ff",
+      "description": "Uma seleção premium de armas e luvas, restrita às variantes exibidas para esta caixa.",
+      "image": "/images/custom-cyan-luxury.svg",
+      "entries": [
+        {
+          "externalId": "skin-1b3ca668024e",
+          "name": "AK-47 | The Empress",
+          "weight": 1800,
+          "variants": [
+            {
+              "wear": "BS",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-1a5e885d9d28",
+          "name": "AK-47 | Neon Revolution",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-bb633c21fc25",
+          "name": "AWP | Asiimov",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-0770dabcd885",
+          "name": "USP-S | Neo-Noir",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FN",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-24bd5ece81d7",
+          "name": "★ Sport Gloves | Bronze Morph",
+          "weight": 1700,
+          "variants": [
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-03513562b183",
+          "name": "★ Hand Wraps | Duct Tape",
+          "weight": 500,
+          "variants": [
+            {
+              "wear": "FN",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-collectors-vault",
+      "name": "Collector’s Vault",
+      "price": "1499.90",
+      "accent": "#a88bff",
+      "description": "Variantes Nova de fábrica e referências elevadas, com todos os resultados e chances publicados.",
+      "image": "/images/custom-collectors-vault.svg",
+      "entries": [
+        {
+          "externalId": "skin-09205674e246",
+          "name": "AK-47 | Asiimov",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FN",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-1b3ca668024e",
+          "name": "AK-47 | The Empress",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FN",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-5e8f5f1fecb1",
+          "name": "★ Driver Gloves | Racing Green",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FN",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-b6c2f9e4afaa",
+          "name": "★ Specialist Gloves | Buckshot",
+          "weight": 1500,
+          "variants": [
+            {
+              "wear": "FN",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-24bd5ece81d7",
+          "name": "★ Sport Gloves | Bronze Morph",
+          "weight": 1000,
+          "variants": [
+            {
+              "wear": "FN",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-midnight",
+      "name": "Midnight",
+      "price": "12.90",
+      "accent": "#88a8d9",
+      "description": "Acabamentos escuros: Slate, Elite Build e Ticket to Hell, com Neo-Noir e Printstream entre os resultados menos frequentes.",
+      "image": "/images/custom/midnight-v2.webp",
+      "entries": [
+        {
+          "externalId": "skin-48e1c7c5df5e",
+          "name": "AK-47 | Slate",
+          "weight": 4000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-f3392bb443bc",
+          "name": "USP-S | Ticket to Hell",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": true
+            }
+          ]
+        },
+        {
+          "externalId": "skin-ea4e27f0cd16",
+          "name": "AK-47 | Elite Build",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": true
+            }
+          ]
+        },
+        {
+          "externalId": "skin-7b1ef066823d",
+          "name": "AWP | Neo-Noir",
+          "weight": 800,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-32a30647e564",
+          "name": "Desert Eagle | Printstream",
+          "weight": 200,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-toxic-bloom",
+      "name": "Toxic Bloom",
+      "price": "19.90",
+      "accent": "#b4ed35",
+      "description": "Uma seleção verde e vibrante: Atheris, Neon Ply e Food Chain, com chances individuais publicadas para cada skin.",
+      "image": "/images/custom/toxic-bloom-v2.webp",
+      "entries": [
+        {
+          "externalId": "skin-d6cf8565026b",
+          "name": "AWP | Atheris",
+          "weight": 4500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": true
+            }
+          ]
+        },
+        {
+          "externalId": "skin-a16b386af5bb",
+          "name": "MP7 | Neon Ply",
+          "weight": 2500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-6d14d557c648",
+          "name": "MP9 | Food Chain",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "BS",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-f10cd3871578",
+          "name": "AK-47 | Ice Coaled",
+          "weight": 900,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-1a5e885d9d28",
+          "name": "AK-47 | Neon Revolution",
+          "weight": 100,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-mecha-core",
+      "name": "Mecha Core",
+      "price": "89.90",
+      "accent": "#ff9d47",
+      "description": "Designs mecânicos e futuristas, com Mecha Industries, Ice Coaled e Asiimov. Os valores dos itens podem ser inferiores ao custo da caixa.",
+      "image": "/images/custom/mecha-core-v2.webp",
+      "entries": [
+        {
+          "externalId": "skin-a79b5b4ad623",
+          "name": "Desert Eagle | Mecha Industries",
+          "weight": 4500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            },
+            {
+              "wear": "MW",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-f10cd3871578",
+          "name": "AK-47 | Ice Coaled",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-09205674e246",
+          "name": "AK-47 | Asiimov",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-bb633c21fc25",
+          "name": "AWP | Asiimov",
+          "weight": 500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-crimson-relay",
+      "name": "Crimson Relay",
+      "price": "119.90",
+      "accent": "#ed4564",
+      "description": "Uma coleção de tons intensos: Redline, Searing Rage e Chromatic Aberration, com The Empress como resultado menos frequente.",
+      "image": "/images/custom/crimson-relay-v2.webp",
+      "entries": [
+        {
+          "externalId": "skin-91a429af4a60",
+          "name": "AK-47 | Redline",
+          "weight": 3500,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-4c2e3face5fd",
+          "name": "AK-47 | Searing Rage",
+          "weight": 3000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-3a4cc2c7a86f",
+          "name": "AWP | Chromatic Aberration",
+          "weight": 2000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-e8144faeae9f",
+          "name": "M4A4 | Neo-Noir",
+          "weight": 1000,
+          "variants": [
+            {
+              "wear": "FT",
+              "statTrak": false
+            }
+          ]
+        },
+        {
+          "externalId": "skin-1b3ca668024e",
+          "name": "AK-47 | The Empress",
+          "weight": 500,
+          "variants": [
+            {
+              "wear": "BS",
+              "statTrak": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

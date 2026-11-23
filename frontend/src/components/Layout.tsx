@@ -15,7 +15,7 @@ import { formatBRL, formatVirtualBalance } from '../services/market';
 import { ProfileMenu } from './ProfileMenu';
 
 export function Layout() {
-  const { user, notice, dismissNotice, inventoryEstimate } = useAuth();
+  const { user, notice, dismissNotice, inventoryEstimate, inventoryLoading, inventoryError } = useAuth();
   const location = useLocation();
   const main = useRef<HTMLElement>(null);
   const previousPath = useRef(location.pathname);
@@ -84,7 +84,11 @@ export function Layout() {
               <span>
                 Valor do inventário
                 <strong>
-                  {inventoryEstimate === undefined
+                  {inventoryLoading
+                    ? 'Carregando...'
+                    : inventoryError
+                      ? 'Indisponível'
+                      : inventoryEstimate === undefined
                     ? 'Consultar'
                     : inventoryEstimate === null
                       ? 'Preço indisponível'
